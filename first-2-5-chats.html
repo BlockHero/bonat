@@ -1,0 +1,199 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>First 2.5 Chats</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&family=Poppins&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to bottom, #ffe3ec, #e6f5e6);
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    .menu-icon {
+      font-size: 24px;
+      cursor: pointer;
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      z-index: 1100;
+      background: #d5eadf;
+      padding: 0.3rem 0.6rem;
+      border-radius: 8px;
+    }
+    .header {
+      padding: 3rem 1rem 2rem;
+      background-color: #d5eadf;
+      text-align: center;
+      position: relative;
+    }
+    .headline {
+      font-family: 'Dancing Script', cursive;
+      font-size: 2rem;
+      color: #3a7e62;
+      margin: 0.5rem 0 0.2rem;
+    }
+    .subheading {
+      font-size: 1.1rem;
+      color: #5a8c79;
+      margin: 0;
+    }
+    .side-menu {
+      position: fixed;
+      top: 0;
+      left: -250px;
+      width: 220px;
+      height: 100%;
+      background-color: #fce4ec;
+      padding-top: 4rem;
+      transition: 0.3s;
+      z-index: 1000;
+      overflow-y: auto;
+      border-right: 2px solid #ffd1dc;
+    }
+    .side-menu.show {
+      left: 0;
+    }
+    .side-menu ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .side-menu li {
+      padding: 10px 20px;
+    }
+    .side-menu a {
+      text-decoration: none;
+      color: #3a7e62;
+      font-weight: bold;
+      display: block;
+    }
+    .submenu {
+      display: none;
+      padding-left: 15px;
+    }
+    .has-submenu > a::after {
+      content: " \25BC";
+      font-size: 0.8rem;
+    }
+    .has-submenu.open .submenu {
+      display: block;
+    }
+    .arrow-down {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #3a7e62;
+      transition: transform 0.3s ease;
+    }
+    .has-submenu.open .arrow-down {
+      transform: rotate(180deg);
+    }
+    .main {
+      padding: 2rem;
+      text-align: center;
+    }
+    .footer {
+      text-align: center;
+      padding: 1rem;
+      background-color: #e0f7fa;
+      font-size: 0.9rem;
+      color: #555;
+      margin-top: auto;
+    }
+    
+    
+.button-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  max-width: 700px;
+  margin: 1.5rem auto 0;
+  gap: 10px;
+}
+.button-grid a {
+  padding: 10px;
+  background-color: #c8e6c9;
+  color: #2d5e47;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  text-align: center;
+  transition: 0.2s ease;
+}
+.button-grid a:hover {
+  background-color: #a5d6a7;
+  transform: scale(1.05);
+}
+</style>
+</head>
+<body>
+  <div class="menu-icon" onclick="toggleMenu()">☰</div>
+<div id="menu-container"></div>
+    </ul>
+  </nav>  <header class="header">
+    <h1 class="headline">Our First 2.5 Month's Chats</h1>
+    <p class="subheading">One of our oldest things I have saved</p>
+  </header>  <main class="main">
+  <h2>Baby, Start from Message 1, Message 1 will take u to page 26, 26 is starting and page 1 is end, and chat goes down to up, you get it?</h2>
+  <div class="button-grid">
+    <!-- 26 message buttons -->
+    <a href="message_26.html">Message 1</a>
+    <a href="message_25.html">Message 2</a>
+    <a href="message_24.html">Message 3</a>
+    <a href="message_23.html">Message 4</a>
+    <a href="message_22.html">Message 5</a>
+    <a href="message_21.html">Message 6</a>
+    <a href="message_20.html">Message 7</a>
+    <a href="message_19.html">Message 8</a>
+    <a href="message_18.html">Message 9</a>
+    <a href="message_17.html">Message 10</a>
+    <a href="message_16.html">Message 11</a>
+    <a href="message_15.html">Message 12</a>
+    <a href="message_14.html">Message 13</a>
+    <a href="message_13.html">Message 14</a>
+    <a href="message_12.html">Message 15</a>
+    <a href="message_11.html">Message 16</a>
+    <a href="message_10.html">Message 17</a>
+    <a href="message_9.html">Message 18</a>
+    <a href="message_8.html">Message 19</a>
+    <a href="message_7.html">Message 20</a>
+    <a href="message_6.html">Message 21</a>
+    <a href="message_5.html">Message 22</a>
+    <a href="message_4.html">Message 23</a>
+    <a href="message_3.html">Message 24</a>
+    <a href="message_2.html">Message 25</a>
+    <a href="message_1.html">Message 26</a>
+  </div>
+</main>  <footer class="footer">
+    <p>I love you Ally, Forever & Always 💌</p>
+  </footer>  <script>
+    function toggleMenu() {
+      document.getElementById("sideMenu").classList.toggle("show");
+    }
+    function toggleSubmenu(event, el) {
+      event.preventDefault();
+      el.parentElement.classList.toggle("open");
+    }
+    
+  
+  function toggleMenu() {
+    document.getElementById("sideMenu").classList.toggle("show");
+  }
+  function toggleSubmenu(event, el) {
+    event.preventDefault();
+    el.parentElement.classList.toggle("open");
+  }
+
+  // Load shared menu
+  fetch("menu.html")
+    .then(res => res.text())
+    .then(data => {
+      document.getElementById("menu-container").innerHTML = data;
+    });
+  </script></body>
+</html>
