@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Top-Down City Game</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: sans-serif;
+    }
+    #game-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    canvas {
+      background-color: #444;
+    }
+    #joystick {
+      position: absolute;
+      bottom: 40px;
+      left: 40px;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+      touch-action: none;
+    }
+    #stick {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background: white;
+      border-radius: 50%;
+      left: 30px;
+      top: 30px;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <canvas id="gameCanvas" width="600" height="600"></canvas>
+    <div id="joystick">
+      <div id="stick"></div>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const tileSize = 32;
+    const map = [
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+      [1,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,1,0,0,1],
+      [1,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,1],
+      [1,0,0,1,0,1,0,1,0,0,0,0,1,0,0,0,1,0,0,1],
+      [1,0,0,1,0,1,0,0,0,1,0,0,1,1,0,1,1,0,0,1],
+      [1,0,0,1,1,1,0,0,0,1,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,1,1,0,0,0,1,1,1,1,1,1],
+      [1,1,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,1],
+      [1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,1],
+      [1,1,1,1,1,1,0,0,1,1,0,0,0,0,0,0,1,0,0,1],
+      [1,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,1,0,0,1],
+      [1,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,1,0,0,1],
+      [1,0,1,1,1,1,0,0,0,1,0,0,1,1,1,1,1,0,0,1],
+      [1,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,1,0,0,1],
+      [1,1,1,1,0,1,0,1,1,1,1,1,1,0,0,0,1,1,0,1],
+      [1,0,0,0,0,1,0,0,0,0,1,0,1,0,0,0,0,1,0,1],
+      [1,0,1,1,0,1,0,0,0,0,1,0,1,0,0,0,0,1,0,1],
+      [1,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,1],
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    ];
+
+    const player = {
+      x: 3 * tileSize,
+      y: 1 * tileSize,
+      size: 28,
+      speed: 2,
+      vx: 0,
+      vy: 0,
+    };
+
+    function isWalkable(x, y) {
+      const tileX = Math.floor(x / tileSize);
+      const tileY = Math.floor(y / tileSize);
+      if (
+        tileY < 0 || tileY >= map.length ||
+        tileX < 0 || tileX >= map[0].length
+      ) return false;
+      return map[tileY][tileX] === 0;
+    }
+
+    function updatePlayer() {
+      const nextX = player.x + player.vx;
+      const nextY = player.y + player.vy;
+
+      const corners = [
+        [nextX, nextY],
+        [nextX + player.size, nextY],
+        [nextX, nextY + player.size],
+        [nextX + player.size, nextY + player.size]
+      ];
+
+      if (corners.every(([x, y]) => isWalkable(x, y))) {
+        player.x = nextX;
+        player.y = nextY;
+      }
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const offsetX = canvas.width / 2 - player.x - player.size / 2;
+      const offsetY = canvas.height / 2 - player.y - player.size / 2;
+
+      for (let y = 0; y < map.length; y++) {
+        for (let x = 0; x < map[y].length; x++) {
+          ctx.fillStyle = map[y][x] === 1 ? "#111" : "#ccc";
+          ctx.fillRect(x * tileSize + offsetX, y * tileSize + offsetY, tileSize, tileSize);
+        }
+      }
+
+      ctx.fillStyle = "#00f";
+      ctx.fillRect(player.x + offsetX, player.y + offsetY, player.size, player.size);
+    }
+
+    function gameLoop() {
+      updatePlayer();
+      draw();
+      requestAnimationFrame(gameLoop);
+    }
+
+    gameLoop();
+
+    // Joystick Controls
+    const joystick = document.getElementById('joystick');
+    const stick = document.getElementById('stick');
+    let dragging = false;
+
+    joystick.addEventListener('touchstart', (e) => {
+      dragging = true;
+    });
+
+    joystick.addEventListener('touchmove', (e) => {
+      if (!dragging) return;
+      const rect = joystick.getBoundingClientRect();
+      const touch = e.touches[0];
+      const dx = touch.clientX - rect.left - 50;
+      const dy = touch.clientY - rect.top - 50;
+
+      const angle = Math.atan2(dy, dx);
+      const dist = Math.min(40, Math.sqrt(dx * dx + dy * dy));
+      stick.style.left = `${30 + Math.cos(angle) * dist}px`;
+      stick.style.top = `${30 + Math.sin(angle) * dist}px`;
+
+      player.vx = Math.cos(angle) * player.speed;
+      player.vy = Math.sin(angle) * player.speed;
+    });
+
+    joystick.addEventListener('touchend', () => {
+      dragging = false;
+      stick.style.left = '30px';
+      stick.style.top = '30px';
+      player.vx = 0;
+      player.vy = 0;
+    });
+  </script>
+</body>
+</html>

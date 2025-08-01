@@ -1,0 +1,227 @@
+<!-- HTML -->
+<div id="gameContainer">
+  <div id="background"></div>
+  <div id="player"></div>
+  <div id="score">Score: 0</div>
+  <button id="playButton">Play</button>
+  <button id="restartButton" style="display: none;">Restart</button>
+</div>
+
+<style>
+  /* CSS */
+  body {
+    margin: 0;
+    overflow: hidden;
+  }
+
+  #gameContainer {
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+    height: 200px;
+    margin: 0 auto;
+    background: #f3f3f3;
+    overflow: hidden;
+    border-radius: 12px;
+    border: 2px solid #333;
+  }
+
+  #background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #f0f0f0;
+    animation: scrollBackground 20s linear infinite;
+  }
+
+  @keyframes scrollBackground {
+    from { background-position-x: 0; }
+    to { background-position-x: -100%; }
+  }
+
+  #player {
+    position: absolute;
+    bottom: 0;
+    left: 50px;
+    width: 40px;
+    height: 40px;
+    background: #333;
+    border-radius: 8px;
+  }
+
+  #score {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-family: sans-serif;
+    font-size: 18px;
+    color: #333;
+  }
+
+  #playButton, #restartButton {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 10px 20px;
+    font-size: 18px;
+    border: none;
+    border-radius: 8px;
+    background: #4CAF50;
+    color: white;
+    cursor: pointer;
+  }
+
+  #playButton:hover, #restartButton:hover {
+    background: #45a049;
+  }
+</style>
+
+<script>
+// JavaScript (Refined T-Rex Game)
+const player = document.getElementById('player');
+const scoreDisplay = document.getElementById('score');
+const container = document.getElementById('gameContainer');
+const playButton = document.getElementById('playButton');
+const restartButton = document.getElementById('restartButton');
+
+let isJumping = false;
+let gravity = 0.6;
+let playerVelocity = 0;
+let speed;
+let score;
+let gameInterval;
+let jumpForce = 12;  // Natural jump height like T-Rex
+let obstacles = [];
+let gameRunning = false;
+
+// Function to create obstacles
+function createObstacle() {
+  const newObstacle = document.createElement('div');
+  newObstacle.classList.add('obstacle');
+  newObstacle.style.position = 'absolute';
+  newObstacle.style.bottom = '0';
+  newObstacle.style.left = `${container.offsetWidth + Math.random() * 200 + 100}px`;  // Position obstacles to spawn randomly
+  newObstacle.style.width = '20px';
+  newObstacle.style.height = '20px';  // Keep obstacles at same size
+  newObstacle.style.backgroundColor = '#333';  // Standard obstacle color
+  container.appendChild(newObstacle);
+  obstacles.push(newObstacle);
+  return newObstacle;
+}
+
+// Function to remove all obstacles
+function removeObstacles() {
+  obstacles.forEach(obstacle => obstacle.remove());
+  obstacles = [];
+}
+
+// Function to restart the game
+function restartGame() {
+  // Reset the game state
+  isJumping = false;
+  playerVelocity = 0;
+  score = 0;
+  scoreDisplay.textContent = "Score: 0";
+  player.style.bottom = "0px";
+
+  // Remove obstacles
+  removeObstacles();
+
+  // Re-initialize the game
+  createObstacle();  // Start with one obstacle
+  speed = 3;  // Start obstacle speed
+  gameRunning = true;
+
+  // Hide restart button, show play button
+  restartButton.style.display = 'none';
+  playButton.style.display = 'none';
+
+  // Start the game
+  clearInterval(gameInterval);
+  gameInterval = setInterval(updateGame, 20);
+}
+
+// Jumping function
+function jump() {
+  if (!isJumping) {
+    playerVelocity = jumpForce;
+    isJumping = true;
+  }
+}
+
+// Update the game each frame
+function updateGame() {
+  // Apply gravity
+  playerVelocity -= gravity;
+  let bottom = parseInt(window.getComputedStyle(player).bottom);
+  bottom += playerVelocity;
+
+  if (bottom <= 0) {
+    bottom = 0;
+    playerVelocity = 0;
+    isJumping = false;
+  }
+  player.style.bottom = bottom + "px";
+
+  // Move obstacles
+  obstacles.forEach((obstacle) => {
+    let obstacleLeft = parseInt(window.getComputedStyle(obstacle).left);
+    obstacleLeft -= speed;
+    obstacle.style.left = obstacleLeft + 'px';
+
+    // Remove obstacles that go off-screen and create a new one
+    if (obstacleLeft < -30) {
+      obstacle.remove();
+      createObstacle();
+      score++;
+      scoreDisplay.textContent = "Score: " + score;
+
+      // Increase speed as the game progresses
+      if (score % 10 === 0) {
+        speed += 0.5;  // Gradually increase speed after every 10 obstacles
+      }
+    }
+
+    // Collision detection
+    const playerRect = player.getBoundingClientRect();
+    const obstacleRect = obstacle.getBoundingClientRect();
+
+    if (
+      playerRect.right > obstacleRect.left &&
+      playerRect.left < obstacleRect.right &&
+      playerRect.bottom > obstacleRect.top &&
+      playerRect.top < obstacleRect.bottom
+    ) {
+      clearInterval(gameInterval);
+      restartButton.style.display = 'block'; // Show the restart button
+    }
+  });
+}
+
+// Start the game
+function startGame() {
+  gameRunning = true;
+
+  // Hide play button and show restart button
+  playButton.style.display = 'none';
+  restartButton.style.display = 'none';
+
+  // Start the game
+  restartGame();
+}
+
+// Event listener for tapping/clicking to jump
+window.addEventListener('touchstart', (e) => {
+  if (gameRunning) jump();
+});
+window.addEventListener('mousedown', (e) => {
+  if (gameRunning) jump();
+});
+
+// Event listeners for the buttons
+playButton.addEventListener('click', startGame);
+restartButton.addEventListener('click', restartGame);
+</script>

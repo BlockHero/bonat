@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>City Game</title>
+  <style>
+    body {
+      margin: 0;
+      background: #111;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    canvas {
+      border: 3px solid #555;
+      margin-top: 10px;
+      background: #999;
+    }
+    .controls {
+      position: absolute;
+      bottom: 20px;
+      display: grid;
+      grid-template-columns: repeat(3, 50px);
+      grid-template-rows: repeat(3, 50px);
+      gap: 8px;
+      justify-content: center;
+      align-items: center;
+    }
+    .controls button {
+      width: 50px;
+      height: 50px;
+      font-size: 18px;
+      border-radius: 10px;
+      background: #222;
+      color: white;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="gameCanvas" width="500" height="500"></canvas>
+
+<div class="controls">
+  <button id="up-left">↖</button>
+  <button id="up">↑</button>
+  <button id="up-right">↗</button>
+  <button id="left">←</button>
+  <button disabled></button>
+  <button id="right">→</button>
+  <button id="down-left">↙</button>
+  <button id="down">↓</button>
+  <button id="down-right">↘</button>
+</div>
+
+<script>
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+
+const TILE_SIZE = 50;
+const MAP_WIDTH = 30;
+const MAP_HEIGHT = 30;
+
+const map = [];
+for (let row = 0; row < MAP_HEIGHT; row++) {
+  map[row] = [];
+  for (let col = 0; col < MAP_WIDTH; col++) {
+    if (row === 0 || row === MAP_HEIGHT - 1 || col === 0 || col === MAP_WIDTH - 1 || Math.random() < 0.2) {
+      map[row][col] = 1; // building
+    } else {
+      map[row][col] = 0; // road
+    }
+  }
+}
+map[1][1] = 0;
+
+const player = {
+  x: 1 * TILE_SIZE + TILE_SIZE / 4,
+  y: 1 * TILE_SIZE + TILE_SIZE / 4,
+  size: TILE_SIZE / 2,
+  speed: 2
+};
+
+const keys = {};
+
+const directions = {
+  up: [0, -1],
+  down: [0, 1],
+  left: [-1, 0],
+  right: [1, 0],
+  "up-left": [-1, -1],
+  "up-right": [1, -1],
+  "down-left": [-1, 1],
+  "down-right": [1, 1]
+};
+
+Object.keys(directions).forEach(dir => {
+  const btn = document.getElementById(dir);
+  if (!btn) return;
+  const start = () => keys[dir] = true;
+  const stop = () => keys[dir] = false;
+
+  btn.addEventListener("mousedown", start);
+  btn.addEventListener("mouseup", stop);
+  btn.addEventListener("mouseleave", stop);
+  btn.addEventListener("touchstart", (e) => { e.preventDefault(); start(); });
+  btn.addEventListener("touchend", (e) => { e.preventDefault(); stop(); });
+});
+
+function isBoxWalkable(x, y, size) {
+  const corners = [
+    [x, y],
+    [x + size, y],
+    [x, y + size],
+    [x + size, y + size]
+  ];
+
+  for (let [cx, cy] of corners) {
+    const col = Math.floor(cx / TILE_SIZE);
+    const row = Math.floor(cy / TILE_SIZE);
+    if (!map[row] || map[row][col] !== 0) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function update() {
+  let dx = 0, dy = 0;
+  for (let dir in keys) {
+    if (keys[dir]) {
+      dx += directions[dir][0];
+      dy += directions[dir][1];
+    }
+  }
+
+  const length = Math.hypot(dx, dy);
+  if (length > 0) {
+    dx = (dx / length) * player.speed;
+    dy = (dy / length) * player.speed;
+
+    const newX = player.x + dx;
+    const newY = player.y + dy;
+    if (isBoxWalkable(newX, newY, player.size)) {
+      player.x = newX;
+      player.y = newY;
+    }
+  }
+}
+
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const camX = player.x + player.size / 2 - canvas.width / 2;
+  const camY = player.y + player.size / 2 - canvas.height / 2;
+
+  for (let row = 0; row < MAP_HEIGHT; row++) {
+    for (let col = 0; col < MAP_WIDTH; col++) {
+      const tileX = col * TILE_SIZE - camX;
+      const tileY = row * TILE_SIZE - camY;
+      ctx.fillStyle = map[row][col] === 1 ? "#333" : "#ddd";
+      ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
+    }
+  }
+
+  ctx.fillStyle = "#e60073";
+  ctx.fillRect(player.x - camX, player.y - camY, player.size, player.size);
+}
+
+function loop() {
+  update();
+  draw();
+  requestAnimationFrame(loop);
+}
+
+loop();
+</script>
+
+</body>
+</html>

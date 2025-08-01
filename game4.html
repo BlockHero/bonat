@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Map Designer</title>
+  <style>
+    #grid {
+      display: grid;
+      grid-template-columns: repeat(20, 20px);
+      gap: 2px;
+    }
+    .cell {
+      width: 20px;
+      height: 20px;
+      background: white;
+      border: 1px solid #ccc;
+      cursor: pointer;
+    }
+    .cell.active {
+      background: black;
+    }
+    #output {
+      white-space: pre;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h3>Click to paint your map. Black = 1 (wall), White = 0 (road)</h3>
+  <div id="grid"></div>
+  <button onclick="generate()">Generate Map Code</button>
+  <pre id="output"></pre>
+
+  <script>
+    const gridSize = 20;
+    const grid = document.getElementById('grid');
+
+    for (let i = 0; i < gridSize * gridSize; i++) {
+      const cell = document.createElement('div');
+      cell.classList.add('cell');
+      cell.addEventListener('click', () => {
+        cell.classList.toggle('active');
+      });
+      grid.appendChild(cell);
+    }
+
+    function generate() {
+      const cells = document.querySelectorAll('.cell');
+      let output = 'const map = [\n';
+      for (let i = 0; i < gridSize; i++) {
+        const row = [];
+        for (let j = 0; j < gridSize; j++) {
+          const idx = i * gridSize + j;
+          row.push(cells[idx].classList.contains('active') ? '1' : '0');
+        }
+        output += '  [' + row.join(',') + '],\n';
+      }
+      output += '];';
+      document.getElementById('output').textContent = output;
+    }
+  </script>
+</body>
+</html>
