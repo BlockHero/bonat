@@ -4,6 +4,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Bonatland</title>
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&family=Poppins&display=swap" rel="stylesheet">
+  <script>
+  const password = prompt("Enter the secret code to open this site:");
+
+  if (password !== "allyNayan123") {  // replace with your secret
+    document.body.innerHTML = "<h2>Access Denied</h2>";
+  }
+  </script>
   <style>
     * {
       box-sizing: border-box;
