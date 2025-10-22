@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Polished Text Adventure</title>
+<style>
+  body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: #f2f2f2;
+    overflow: hidden;
+  }
+  #menu, #gameScreen {
+    display: none;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    position: relative;
+  }
+  #menu.active, #gameScreen.active {
+    display: flex;
+  }
+  #textBox {
+    width: 90%;
+    max-width: 500px;
+    height: 200px;
+    border: 2px solid #333;
+    padding: 10px;
+    overflow-y: auto;
+    background-color: #fff;
+    margin-bottom: 10px;
+    border-radius: 8px;
+  }
+  #actionLine {
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+  #choices {
+    display: flex;
+    flex-direction: column;
+    width: 90%;
+    max-width: 500px;
+  }
+  .choiceBtn {
+    margin: 5px 0;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 6px;
+    background-color: #4CAF50;
+    color: white;
+  }
+  .choiceBtn:disabled {
+    background-color: #888;
+  }
+  #pauseBtn, #inventoryBtn {
+    position: absolute;
+    padding: 8px 12px;
+    font-size: 14px;
+    border-radius: 4px;
+    border: none;
+    background-color: #333;
+    color: #fff;
+  }
+  #pauseBtn { top: 10px; right: 10px; }
+  #inventoryBtn { top: 10px; left: 10px; }
+  #pauseMenu, #inventoryPopup {
+    display: none;
+    position: absolute;
+    top: 50px;
+    background-color: #fff;
+    border: 2px solid #333;
+    padding: 10px;
+    border-radius: 6px;
+    z-index: 10;
+  }
+  #pauseMenu { right: 10px; width: 220px; }
+  #inventoryPopup { left: 10px; width: 220px; } 
+  #pauseMenu input[type="range"] {
+    width: 100%;
+  }
+  #overlayDim {
+    display: none;
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.3);
+    z-index: 5;
+  }
+</style>
+</head>
+<body>
+<!-- Game Screen -->
+<div id="gameScreen" class="active">
+  <div id="overlayDim"></div>
+  <button id="pauseBtn">Pause</button>
+  <button id="inventoryBtn">Inventory</button>
+  
+  <div id="pauseMenu">
+    <p>Background Music Volume</p>
+    <input type="range" id="musicVolume" min="0" max="1" step="0.01" value="0.5">
+    <button onclick="togglePause()">Close</button>
+  </div>
+  
+  <div id="inventoryPopup">
+    <p><strong>Inventory:</strong></p>
+    <ul id="inventoryList"></ul>
+    <button onclick="toggleInventory()">Close</button>
+  </div>
+
+  <div id="textBox"></div>
+  <div id="actionLine">What will you do next?</div>
+  <div id="choices"></div>
+</div>
+
+<script>
+const gameScreen = document.getElementById('gameScreen');
+const textBox = document.getElementById('textBox');
+const choicesDiv = document.getElementById('choices');
+const actionLine = document.getElementById('actionLine');
+const pauseBtn = document.getElementById('pauseBtn');
+const pauseMenu = document.getElementById('pauseMenu');
+const overlayDim = document.getElementById('overlayDim');
+const inventoryBtn = document.getElementById('inventoryBtn');
+const inventoryPopup = document.getElementById('inventoryPopup');
+const inventoryList = document.getElementById('inventoryList');
+const musicVolume = document.getElementById('musicVolume');
+
+let inventory = [];
+let currentScene = "room";
+let isTyping = false;
+let bgMusic = new Audio();
+pauseBtn.addEventListener('click', togglePause);
+inventoryBtn.addEventListener('click', toggleInventory);
+
+function togglePause() {
+  const isOpen = pauseMenu.style.display === 'block';
+  pauseMenu.style.display = isOpen ? 'none' : 'block';
+  overlayDim.style.display = isOpen ? 'none' : 'block';
+}
+
+function toggleInventory() {
+  const isOpen = inventoryPopup.style.display === 'block';
+  if(!isOpen) updateInventoryDisplay();
+  inventoryPopup.style.display = isOpen ? 'none' : 'block';
+  overlayDim.style.display = isOpen ? 'none' : 'block';
+}
+
+function updateInventoryDisplay() {
+  inventoryList.innerHTML = '';
+  inventory.forEach(item => {
+    const li = document.createElement('li');
+    li.textContent = item;
+    inventoryList.appendChild(li);
+  });
+}
+
+musicVolume.addEventListener('input', () => {
+  bgMusic.volume = musicVolume.value;
+});
+
+// Scenes
+const scenes = {
+  "room": {
+    description: "You are in a small room. There is a door in front of you, and a small table with a key on it.",
+    choices: [
+      { text: "Pick up the key", action: () => {
+        if(!inventory.includes("Key")) {
+          addToInventory("Key");
+          appendText("> You picked up the key.", true);
+        } else {
+          appendText("> You already have the key.", true);
+        }
+        updateChoices(scenes.room.choices);
+      }},
+      { text: "Open the door", action: () => {
+        if(inventory.includes("Key")) {
+          appendText("> You unlocked and opened the door.", true);
+          currentScene = "hallway";
+          loadScene(currentScene);
+        } else {
+          appendText("> The door is locked.", true);
+        }
+      }},
+      { text: "Examine table", action: () => { appendText("The table is small and old. The key is shiny."); } }
+    ]
+  },
+  "hallway": {
+    description: "You are in a bright hallway. Congratulations! You have left the room.",
+    choices: [
+      { text: "Finish", action: () => {
+        appendText("> The adventure ends here. Well done!", true);
+        choicesDiv.innerHTML = "";
+        actionLine.style.display = 'none';
+      } }
+    ]
+  }
+};
+
+
+// Auto-start the game immediately (no menu)
+startGame();
+// Functions
+function startGame() {
+  loadScene(currentScene);
+}
+
+function loadScene(sceneName) {
+  const scene = scenes[sceneName];
+  appendText(scene.description);
+  updateChoices(scene.choices);
+}
+
+function appendText(text, isAction=false) {
+  if(isTyping) return;
+  isTyping = true;
+  const p = document.createElement('p');
+  p.style.margin = '4px 0';
+  if(isAction) {
+    p.innerHTML = `<strong>${text}</strong>`;
+  } else {
+    p.innerHTML = text;
+  }
+  textBox.appendChild(p);
+  typeWriterEffect(p, text, () => {
+    textBox.scrollTop = textBox.scrollHeight;
+    isTyping = false;
+  });
+}
+
+function typeWriterEffect(element, text, callback) {
+  element.innerHTML = '';
+  let i = 0;
+  const speed = 25;
+  const interval = setInterval(() => {
+    element.innerHTML += text.charAt(i);
+    i++;
+    textBox.scrollTop = textBox.scrollHeight;
+    if(i >= text.length) {
+      clearInterval(interval);
+      callback();
+    }
+  }, speed);
+}
+
+function updateChoices(choices) {
+  choicesDiv.innerHTML = '';
+  if(choices.length === 0) return;
+  actionLine.style.display = 'block';
+  choices.forEach(choice => {
+    const btn = document.createElement('button');
+    btn.className = 'choiceBtn';
+    btn.textContent = choice.text;
+    btn.onclick = () => {
+      disableChoices();
+      setTimeout(() => { choice.action(); enableChoices(); }, 100);
+    };
+    choicesDiv.appendChild(btn);
+  });
+
+  // Always add "Putankina" button
+  const putankinaBtn = document.createElement('button');
+  putankinaBtn.className = 'choiceBtn';
+  putankinaBtn.textContent = "Putankina";
+  putankinaBtn.onclick = () => appendText("> Putankina", true);
+  choicesDiv.appendChild(putankinaBtn);
+}
+
+function addToInventory(item) {
+  inventory.push(item);
+}
+
+function disableChoices() {
+  const buttons = choicesDiv.querySelectorAll('button');
+  buttons.forEach(btn => btn.disabled = true);
+}
+
+function enableChoices() {
+  const buttons = choicesDiv.querySelectorAll('button');
+  buttons.forEach(btn => btn.disabled = false);
+}
+
+</script>
+
+</body>
+</html>
