@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>yo😒</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&display=swap" rel="stylesheet">
+
+<style>
+html,body{
+  margin:0;
+  padding:0;
+  height:100%;
+  overflow:hidden;
+  background:#0b0f14;
+  font-family:'Segoe UI',system-ui,sans-serif;
+}
+canvas{display:block}
+#welcomeScreen{
+  position:absolute;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,0.85);
+  color:#fff;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  font-family:'Cinzel', serif;
+  z-index:10;
+}
+#welcomeScreen button{
+  margin-top:20px;
+  padding:12px 24px;
+  font-size:18px;
+  cursor:pointer;
+  background:rgba(255,255,255,0.1);
+  color:#fff;
+  border:2px solid #fff;
+  border-radius:8px;
+}
+</style>
+</head>
+<body>
+<div id="welcomeScreen">
+  <h1>Baby</h1>
+  <p>Come here, touch touch</p>
+  <button id="startBtn">touch</button>
+</div>
+
+<canvas id="c"></canvas>
+
+<audio id="bgMusic" loop>
+  <source src="19thmusic.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+const canvas=document.getElementById('c');
+const ctx=canvas.getContext('2d');
+let W=canvas.width=innerWidth;
+let H=canvas.height=innerHeight;
+
+/* ─── Stars ─── */
+const stars=Array.from({length:120},()=>({
+  x:Math.random()*W,
+  y:Math.random()*H*0.4,
+  base:0.3+Math.random()*0.5,
+  spd:0.002+Math.random()*0.002
+}));
+
+/* ─── Fireflies ─── */
+const fireflies=Array.from({length:18},()=>({
+  x:Math.random()*W,
+  y:Math.random()*(H*0.85),
+  t:Math.random()*20,
+  s:0.5+Math.random()*0.5
+}));
+
+/* ─── Particles ─── */
+const petals=[], hearts=[], ripples=[];
+
+/* ─── Shooting star ─── */
+let shootingStar=null;
+setInterval(()=>{
+  shootingStar={x:-120,y:80+Math.random()*140,vx:14,vy:5,l:0};
+},3500);
+
+/* ─── Environment ─── */
+let grass=[], bushes=[];
+function generateEnv(){
+  grass=[];
+  for(let i=0;i<W;i+=6){
+    grass.push({x:i,y:H*0.74,h:10+Math.random()*12});
+  }
+  bushes=[];
+  for(let i=0;i<6;i++){
+    bushes.push({x:i*160+(Math.random()*80-40),r:45+Math.random()*35});
+  }
+}
+generateEnv();
+
+/* ─── Tree ─── */
+const tree={
+  x:()=>W/2+150,
+  trunkH:170,
+  leaves:[[-50,-170,65],[0,-190,80],[50,-170,65],[-10,-135,70]]
+};
+
+/* ─── Resize ─── */
+addEventListener('resize',()=>{
+  W=canvas.width=innerWidth;
+  H=canvas.height=innerHeight;
+  generateEnv();
+  textBox.x = W/2;
+  textBox.width = Math.min(600,W*0.8);
+});
+
+/* ─── Spawns ─── */
+setInterval(()=>petals.push({x:Math.random()*W,y:-10,a:Math.random(),s:0.3+Math.random()*0.2}),2500);
+setInterval(()=>hearts.push({
+  x:Math.random()*W,y:-30,size:6+Math.random()*10,
+  drift:Math.random()*0.7-0.35,rot:Math.random()*Math.PI*2,
+  rs:(Math.random()-0.5)*0.04,spd:0.6+Math.random()*1.1
+}),1800);
+
+/* ─── Tap ripple ─── */
+canvas.addEventListener('click',e=>{
+  const r=canvas.getBoundingClientRect();
+  ripples.push({x:e.clientX-r.left,y:e.clientY-r.top,r:0,a:0.5});
+});
+
+/* ─── Draw helpers ─── */
+function sky(){
+  const g=ctx.createLinearGradient(0,0,0,H*0.75);
+  g.addColorStop(0,'#2a3350');
+  g.addColorStop(0.55,'#141a26');
+  g.addColorStop(1,'#0b0f14');
+  ctx.fillStyle=g;
+  ctx.fillRect(0,0,W,H);
+}
+function drawStars(){
+  stars.forEach(s=>{
+    const a=s.base+0.2*Math.sin(performance.now()*s.spd+s.x);
+    ctx.fillStyle=`rgba(255,255,255,${a})`;
+    ctx.fillRect(s.x,s.y,2,2);
+  });
+}
+function moon(){
+  const mx=W*0.65,my=H*0.14;
+  ctx.fillStyle='rgba(255,245,210,0.9)';
+  ctx.beginPath();ctx.arc(mx,my,50,0,Math.PI*2);ctx.fill();
+  const g=ctx.createRadialGradient(mx,my,50,mx,my,160);
+  g.addColorStop(0,'rgba(255,245,210,0.3)');
+  g.addColorStop(1,'rgba(255,245,210,0)');
+  ctx.fillStyle=g;
+  ctx.beginPath();ctx.arc(mx,my,160,0,Math.PI*2);ctx.fill();
+}
+function clouds(){
+  ctx.fillStyle='rgba(50,60,90,0.25)';
+  for(let i=0;i<5;i++){
+    const x=(performance.now()*0.008+i*280)%(W+400)-200;
+    ctx.beginPath();ctx.arc(x,90+i*25,110,0,Math.PI*2);ctx.fill();
+  }
+}
+function ground(){
+  const y = H * 0.74;
+  const g = ctx.createLinearGradient(0, y - 30, 0, H);
+  g.addColorStop(0, 'rgba(15,20,30,0.95)');
+  g.addColorStop(0.35, '#0e1913');
+  g.addColorStop(1, '#060d0a');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, y - 30, W, H - y + 30);
+}
+function drawBushes(){
+  bushes.forEach(b=>{
+    const g=ctx.createRadialGradient(b.x,H*0.74,8,b.x,H*0.74,b.r);
+    g.addColorStop(0,'rgba(70,140,90,0.55)');
+    g.addColorStop(1,'rgba(30,80,50,0)');
+    ctx.fillStyle=g;
+    ctx.beginPath();ctx.arc(b.x,H*0.74,b.r,0,Math.PI*2);ctx.fill();
+  });
+}
+function drawGrass(){
+  grass.forEach(b=>{
+    ctx.strokeStyle='rgba(80,160,100,0.18)';
+    ctx.lineWidth=1.4;
+    ctx.beginPath();
+    ctx.moveTo(b.x,H*0.74);
+    ctx.quadraticCurveTo(b.x,H*0.74-b.h,b.x+4,H*0.74);
+    ctx.stroke();
+  });
+}
+function drawTree(){
+  ctx.fillStyle='#3b2a20';
+  ctx.fillRect(tree.x()-13,H*0.74-tree.trunkH,26,tree.trunkH);
+  ctx.fillStyle='#1a3327';
+  tree.leaves.forEach(l=>{
+    ctx.beginPath();
+    ctx.arc(tree.x()+l[0],H*0.74+l[1],l[2],0,Math.PI*2);
+    ctx.fill();
+  });
+}
+function firefly(){
+  fireflies.forEach(f=>{
+    f.t+=0.02*f.s;
+    f.x+=Math.sin(f.t*1.3)*0.4;
+    f.y+=Math.cos(f.t*2.1)*0.25;
+    const a=0.5+0.5*Math.sin(f.t*5);
+    ctx.fillStyle=`rgba(255,245,170,${a})`;
+    ctx.beginPath();ctx.arc(f.x,f.y,3.5,0,Math.PI*2);ctx.fill();
+  });
+}
+function petalsDraw(){
+  petals.forEach((p,i)=>{
+    p.y+=p.s;p.x+=Math.sin(p.a+=0.01);
+    ctx.fillStyle='rgba(255,200,215,0.6)';
+    ctx.beginPath();ctx.ellipse(p.x,p.y,4,2,p.a,0,Math.PI*2);ctx.fill();
+    if(p.y>H)petals.splice(i,1);
+  });
+}
+function heartsDraw(){
+  hearts.forEach((h,i)=>{
+    h.y+=h.spd;h.x+=Math.sin(h.rot*8+h.y*0.01)*h.drift;h.rot+=h.rs;
+    if(h.y>H)hearts.splice(i,1);
+    ctx.save();
+    ctx.translate(h.x,h.y);ctx.rotate(h.rot);
+    ctx.fillStyle='rgba(255,100,180,0.75)';
+    ctx.beginPath();
+    ctx.moveTo(0,-h.size);
+    ctx.bezierCurveTo(h.size*1.4,-h.size*1.6,h.size*2,-h.size*0.4,0,h.size*1.1);
+    ctx.bezierCurveTo(-h.size*2,-h.size*0.4,-h.size*1.4,-h.size*1.6,0,-h.size);
+    ctx.fill();ctx.restore();
+  });
+}
+function shooting(){
+  if(!shootingStar)return;
+  shootingStar.x+=shootingStar.vx;
+  shootingStar.y+=shootingStar.vy;
+  shootingStar.l++;
+  ctx.strokeStyle='rgba(255,255,255,0.8)';
+  ctx.lineWidth=2;
+  ctx.beginPath();
+  ctx.moveTo(shootingStar.x,shootingStar.y);
+  ctx.lineTo(shootingStar.x-60,shootingStar.y-20);
+  ctx.stroke();
+  if(shootingStar.l>40)shootingStar=null;
+}
+function ripplesDraw(){
+  ripples.forEach((r,i)=>{
+    r.r+=2;r.a-=0.01;
+    ctx.strokeStyle=`rgba(255,220,200,${r.a})`;
+    ctx.beginPath();ctx.arc(r.x,r.y,r.r,0,Math.PI*2);ctx.stroke();
+    if(r.a<=0)ripples.splice(i,1);
+  });
+}
+
+/* ─── Personalized Paragraph ─── */
+let paragraphText = `Ik u are probably grumpy while reading this just like u are usually, my grumpyness baby. I made this small thing to remind u another month that I still haven't given up from u.
+
+Another month together, we don't know what's going to happen in future and we know what has happened before between us. what matters is what we will do now in present.
+
+I love you for staying w me and giving company. 
+It's just simple small ahh stupid ass message for your appreciation for u because how much I love you. Thanks for times u have helped me and made me feel loved.
+
+Even though I haven't forgotten you technically lowkey ruined my life but I want u to know I'm still here, w you so don't disappoint me too. I'm not asking for big favors but just give me what I should deserve after all this.
+
+Love you, for past months and for more to come. I love you so much Ally, Happy 19th Monthversary ❤️.`;
+
+let paragraphLines = paragraphText.split('\n');
+let creditY = H + 200;
+const textBox={ x:W/2, width:Math.min(600,W*0.8) };
+
+function drawParagraph(){
+  ctx.save();
+  ctx.shadowColor="rgba(255,240,255,0.35)";
+  ctx.shadowBlur=18;
+  ctx.font="28px 'Cinzel', serif";
+  ctx.fillStyle="rgba(255,230,240,0.9)";
+  ctx.textAlign="center";
+
+  let cursorY = creditY;
+  paragraphLines.forEach(line=>{
+    const words = line.split(' ');
+    let lineText = '', lines = [];
+    words.forEach(w=>{
+      const testLine = lineText + w + ' ';
+      if(ctx.measureText(testLine).width > textBox.width){
+        lines.push(lineText);
+        lineText = w + ' ';
+      } else lineText = testLine;
+    });
+    lines.push(lineText);
+    lines.forEach(l=>{
+      ctx.fillText(l.trim(), textBox.x, cursorY);
+      cursorY += 36;
+    });
+    cursorY += 18; // extra spacing between paragraphs
+  });
+
+  creditY -= 0.6; // scroll speed
+  ctx.restore();
+}
+
+/* ─── Welcome + Music ─── */
+const welcomeScreen=document.getElementById('welcomeScreen');
+const startBtn=document.getElementById('startBtn');
+const bgMusic=document.getElementById('bgMusic');
+
+startBtn.addEventListener('click',()=>{
+  welcomeScreen.style.display='none';
+  bgMusic.play();
+});
+
+/* ─── Loop ─── */
+(function loop(){
+  ctx.clearRect(0,0,W,H);
+  sky();
+  drawStars();
+  moon();
+  clouds();
+  ground();
+  drawBushes();
+  drawTree();
+  drawGrass();
+  shooting();
+  petalsDraw();
+  heartsDraw();
+  firefly();
+  ripplesDraw();
+  drawParagraph();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
