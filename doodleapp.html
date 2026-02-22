@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Doodle</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root{
+  --matcha:#9fce8a;
+  --matcha-dark:#7ead6d;
+  --pink:#ff9fc8;
+  --soft:#f5f1f7;
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:"Poppins",sans-serif;
+  -webkit-tap-highlight-color:transparent;
+}
+
+body{
+  background:#dcdcdc;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  overflow:hidden;
+}
+
+.phone{
+  width:380px;
+  height:780px;
+  background:#fff;
+  border-radius:32px;
+  box-shadow:0 20px 40px rgba(0,0,0,0.2);
+  position:relative;
+  overflow:hidden;
+}
+
+.app-bg{
+  position:absolute;
+  inset:0;
+  background:#f5f5f8;
+  z-index:0;
+}
+
+.statusbar{
+  position:absolute;
+  top:0;
+  width:100%;
+  height:46px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:0 14px;
+  color:#2c2c2c;
+  font-size:15px;
+  z-index:20;
+}
+
+.notif-shade{
+  position:absolute;
+  left:0; right:0; top:0;
+  height:58%;
+  background:#ffffffee;
+  backdrop-filter: blur(10px);
+  border-bottom-left-radius:26px;
+  border-bottom-right-radius:26px;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.15);
+  transform: translateY(-100%);
+  transition: transform 260ms cubic-bezier(.2,.9,.3,1);
+  z-index:19;
+  pointer-events:none;
+  padding:18px;
+}
+
+.notif-shade.open{
+  transform: translateY(0);
+  pointer-events:auto;
+}
+
+.shade-handle{
+  width:55px;
+  height:6px;
+  background:#cfcfcf;
+  border-radius:10px;
+  margin:auto;
+}
+
+.notif-title{
+  margin-top:16px;
+  font-weight:600;
+  text-align:center;
+  color:#444;
+}
+
+.music-controls{
+  margin-top:20px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  background:#f2f7ea;
+  border-radius:14px;
+  padding:14px;
+  width:100%;
+  box-shadow:0 4px 10px rgba(0,0,0,0.05);
+}
+
+#trackTitle{
+  font-size:14px;
+  color:#3f3f3f;
+}
+
+.music-btn{
+  width:50px;
+  height:50px;
+  background:var(--matcha);
+  border-radius:14px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size:22px;
+  color:white;
+  cursor:pointer;
+}
+
+.progress-wrap{
+  height:7px;
+  background:#d3e9cd;
+  border-radius:10px;
+  margin-top:5px;
+  overflow:hidden;
+}
+
+#progressBar{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,var(--matcha-dark),var(--pink));
+  transition:width .1s linear;
+}
+
+.doodle-container{
+  position:absolute;
+  top:56px;
+  bottom:70px;
+  left:0; right:0;
+  padding:16px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  z-index:1;
+}
+
+#doodleCanvas{
+  flex:1;
+  background:#ffffff;
+  border-radius:14px;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.05);
+  touch-action:none;
+}
+
+.toolbar{
+  display:flex;
+  gap:8px;
+  justify-content:center;
+}
+
+.tool-btn{
+  flex:1;
+  padding:10px;
+  border-radius:12px;
+  background:linear-gradient(180deg,#fff,#ffeef6);
+  border:1px solid rgba(0,0,0,0.04);
+  cursor:pointer;
+  font-weight:700;
+  text-align:center;
+}
+
+.dock{
+  position:absolute;
+  bottom:0;
+  left:0;
+  width:100%;
+  height:70px;
+  display:flex;
+  justify-content:center;
+  gap:40px;
+  align-items:center;
+  background:#ffffffdd;
+  backdrop-filter:blur(6px);
+  z-index:20;
+}
+
+.nav-btn{
+  width:60px;
+  height:60px;
+  background:#ffffff;
+  border-radius:20px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size:26px;
+  box-shadow:0 6px 16px rgba(0,0,0,0.1);
+  cursor:pointer;
+}
+
+.message-notif {
+  margin-top: 16px;
+  background: #e7eee2;
+  padding: 12px 14px;
+  border-radius: 12px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+  font-size: 14px;
+  color: #333;
+}
+
+.message-sender {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.message-text {
+  opacity: 0.85;
+}
+</style>
+</head>
+
+<body>
+<div class="phone" id="phone">
+
+  <div class="app-bg"></div>
+
+  <div class="notif-shade" id="notifShade">
+    <div class="shade-handle"></div>
+    <div class="notif-title">Notifications</div>
+
+    <div class="music-controls">
+      <div style="flex:1">
+        <div id="trackTitle">Doodle App Ambience</div>
+        <div class="progress-wrap"><div id="progressBar"></div></div>
+      </div>
+      <div id="playPauseBtn" class="music-btn">▶️</div>
+    </div>
+    <!-- Inside .notif-shade, under .music-controls -->
+<div class="message-notif">
+  <div class="message-sender">Nayan Husbanto</div>
+  <div class="message-text">Draw me</div>
+</div>
+  </div>
+
+  <div class="statusbar">
+    <div><span id="statusTime">12:00</span></div>
+    <div>
+      <span>A❤️N</span>
+      <span>🛜</span>
+    </div>
+  </div>
+
+  <div class="doodle-container">
+    <canvas id="doodleCanvas"></canvas>
+    <div class="toolbar">
+      <div class="tool-btn" id="undoBtn">↩ Undo</div>
+      <div class="tool-btn" id="redoBtn">↪ Redo</div>
+      <div class="tool-btn" id="saveBtn">💾 Save</div>
+    </div>
+  </div>
+
+  <div class="dock">
+    <div class="nav-btn" onclick="history.back()">⬅</div>
+    <div class="nav-btn" onclick="window.location='17th.html'">🏠</div>
+  </div>
+
+  <audio id="bgMusic" src="17music4.mp3" loop preload="auto"></audio>
+
+</div>
+
+<script>
+/* ================= TIME ================= */
+function updateTime(){
+  const t=new Date();
+  let h=t.getHours();
+  let m=t.getMinutes();
+  if(m<10)m="0"+m;
+  document.getElementById("statusTime").textContent=h+":"+m;
+}
+setInterval(updateTime,1000);
+updateTime();
+
+/* ================= MUSIC ================= */
+const music=document.getElementById("bgMusic");
+const playBtn=document.getElementById("playPauseBtn");
+const progress=document.getElementById("progressBar");
+playBtn.onclick=()=>{
+  if(music.paused){ music.play(); playBtn.textContent="⏸️"; }
+  else { music.pause(); playBtn.textContent="▶️"; }
+};
+music.ontimeupdate=()=>{ if(music.duration){ progress.style.width=(music.currentTime/music.duration)*100+"%"; } };
+document.querySelector(".progress-wrap").onclick=e=>{
+  const rect=e.target.getBoundingClientRect();
+  const x=e.clientX-rect.left;
+  music.currentTime=(x/rect.width)*music.duration;
+};
+
+/* ================= NOTIFICATION SHADE SWIPE ================= */
+const notif=document.getElementById("notifShade");
+const phone=document.getElementById("phone");
+let startY=0, drawing=false;
+
+phone.addEventListener("touchstart",e=>{
+  startY=e.touches[0].clientY;
+});
+phone.addEventListener("touchmove",e=>{
+  if(drawing) return; // prevent opening shade while drawing
+  const delta=e.touches[0].clientY-startY;
+  if(delta>40) notif.classList.add("open");
+  if(delta<-40) notif.classList.remove("open");
+});
+
+/* ================= DOODLE ================= */
+const canvas=document.getElementById("doodleCanvas");
+const ctx=canvas.getContext("2d");
+let strokes=[], undoneStrokes=[];
+
+function resizeCanvas(){
+  canvas.width=canvas.offsetWidth;
+  canvas.height=canvas.offsetHeight;
+  redraw();
+}
+window.addEventListener("resize",resizeCanvas);
+resizeCanvas();
+
+canvas.addEventListener("pointerdown",e=>{
+  drawing=true;
+  ctx.beginPath();
+  ctx.moveTo(e.offsetX,e.offsetY);
+  strokes.push([{x:e.offsetX,y:e.offsetY}]);
+});
+
+canvas.addEventListener("pointermove",e=>{
+  if(!drawing) return;
+  ctx.lineTo(e.offsetX,e.offsetY);
+  ctx.strokeStyle="#000000"; // BLACK PEN
+  ctx.lineWidth=4;
+  ctx.lineCap="round";
+  ctx.lineJoin="round";
+  ctx.stroke();
+  strokes[strokes.length-1].push({x:e.offsetX,y:e.offsetY});
+});
+
+canvas.addEventListener("pointerup",()=>{drawing=false; undoneStrokes=[];});
+canvas.addEventListener("pointerleave",()=>{drawing=false;});
+
+function redraw(){
+  ctx.fillStyle="#ffffff"; // fill white background
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  for(const s of strokes){
+    ctx.beginPath();
+    for(let i=0;i<s.length;i++){
+      const p=s[i];
+      if(i===0) ctx.moveTo(p.x,p.y);
+      else ctx.lineTo(p.x,p.y);
+    }
+    ctx.strokeStyle="#000000";
+    ctx.lineWidth=4;
+    ctx.lineCap="round";
+    ctx.lineJoin="round";
+    ctx.stroke();
+  }
+}
+
+document.getElementById("undoBtn").onclick=()=>{
+  if(strokes.length){ undoneStrokes.push(strokes.pop()); redraw(); }
+};
+document.getElementById("redoBtn").onclick=()=>{
+  if(undoneStrokes.length){ strokes.push(undoneStrokes.pop()); redraw(); }
+};
+
+document.getElementById("saveBtn").onclick=()=>{
+  const tmpCanvas=document.createElement("canvas");
+  tmpCanvas.width=canvas.width;
+  tmpCanvas.height=canvas.height;
+  const tmpCtx=tmpCanvas.getContext("2d");
+
+  tmpCtx.fillStyle="#ffffff"; // white background
+  tmpCtx.fillRect(0,0,tmpCanvas.width,tmpCanvas.height);
+
+  // draw all strokes
+  for(const s of strokes){
+    tmpCtx.beginPath();
+    for(let i=0;i<s.length;i++){
+      const p=s[i];
+      if(i===0) tmpCtx.moveTo(p.x,p.y);
+      else tmpCtx.lineTo(p.x,p.y);
+    }
+    tmpCtx.strokeStyle="#000000";
+    tmpCtx.lineWidth=4;
+    tmpCtx.lineCap="round";
+    tmpCtx.lineJoin="round";
+    tmpCtx.stroke();
+  }
+
+  const link=document.createElement("a");
+  link.download="doodle.jpg";
+  link.href=tmpCanvas.toDataURL("image/jpeg",1.0);
+  link.click();
+};
+
+const bgMusic = document.getElementById("bgMusic");
+bgMusic.loop = true;
+
+// Prevent auto-play block on load
+let musicUnlocked = false;
+
+function tryPlayMusic() {
+    if (!musicUnlocked) {
+        bgMusic.play()
+            .then(() => { musicUnlocked = true; })
+            .catch(() => { /* still locked; will retry */ });
+    }
+}
+
+// Try to play automatically on page load (may fail if no user interaction yet)
+window.addEventListener("load", () => {
+    tryPlayMusic();
+});
+
+// ANY interaction unlocks playback
+["click", "touchstart", "keydown"].forEach(evt => {
+    document.addEventListener(evt, () => {
+        tryPlayMusic();
+    }, { once:false });
+});
+</script>
+</body>
+</html>
