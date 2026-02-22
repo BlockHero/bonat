@@ -1,0 +1,519 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bonatland</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&family=Poppins&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(to bottom, #ffe3ec, #e6f5e6);
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  scroll-behavior: smooth;
+}
+
+.menu-icon {
+  font-size: 24px;
+  cursor: pointer;
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 1100;
+  background: #d5eadf;
+  padding: 0.3rem 0.6rem;
+  border-radius: 8px;
+}
+
+.header {
+  padding: 3rem 1rem 2rem;
+  background-color: #d5eadf;
+  text-align: center;
+  position: relative;
+}
+
+.headline {
+  font-family: 'Dancing Script', cursive;
+  font-size: 2rem;
+  color: #3a7e62;
+  margin: 0.5rem 0 0.2rem;
+}
+
+.subheading {
+  font-size: 1.1rem;
+  color: #5a8c79;
+  margin: 0;
+}
+
+.since {
+  font-size: 1rem;
+  color: #3a7e62;
+  margin-top: 0.3rem;
+}
+
+.timer-box {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.7rem 1.2rem;
+  background-color: #ffffffcc;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  font-size: 1rem;
+  color: #3a7e62;
+}
+
+.timer-value {
+  font-size: 1.2rem;
+  font-weight: bold;
+  display: block;
+  margin-top: 0.3rem;
+}
+
+.side-menu {
+  position: fixed;
+  top: 0;
+  left: -250px;
+  width: 220px;
+  height: 100%;
+  background-color: #fce4ec;
+  padding-top: 4rem;
+  transition: 0.3s;
+  z-index: 1000;
+  overflow-y: auto;
+  border-right: 2px solid #ffd1dc;
+}
+
+.side-menu.show {
+  left: 0;
+}
+
+.side-menu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.side-menu li {
+  padding: 10px 20px;
+  position: relative;
+}
+
+.side-menu a {
+  text-decoration: none;
+  color: #3a7e62;
+  font-weight: bold;
+  display: block;
+}
+
+.has-submenu > a::after {
+  content: " ▼";
+  font-size: 0.8rem;
+  float: right;
+}
+
+.submenu {
+  display: none;
+  padding-left: 15px;
+}
+
+.has-submenu.open .submenu {
+  display: block;
+}
+
+.main {
+  text-align: center;
+  padding: 2rem;
+  animation: fadeIn 1s ease-in;
+}
+
+.hero-image img {
+  max-width: 90%;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.intro-card, .quotes-section {
+  background: #ffffffcc;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  max-width: 600px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  animation: fadeIn 2s ease-in;
+}
+
+.quotes-section blockquote {
+  font-style: italic;
+  font-size: 1.1rem;
+  color: #3a7e62;
+}
+
+.footer {
+  text-align: center;
+  padding: 1rem;
+  background-color: #e0f7fa;
+  font-size: 0.9rem;
+  color: #555;
+  margin-top: auto;
+}
+
+.music-btn {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  background: #f8bbd0;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  z-index: 2000;
+}
+
+.hover-anim:hover {
+  transform: scale(1.02);
+  transition: transform 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 235, 238, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 3000;
+  backdrop-filter: blur(4px);
+}
+
+.popup-box {
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 18px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+  max-width: 90%;
+  text-align: center;
+  font-family: 'Dancing Script', cursive;
+  color: #c2185b;
+  animation: fadeIn 0.6s ease-out;
+}
+
+.popup-box h2 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.popup-box p {
+  font-size: 1.2rem;
+  margin-bottom: 1.5rem;
+}
+
+.popup-play-btn {
+  background-color: #f8bbd0;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 30px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #880e4f;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.popup-play-btn:hover {
+  background-color: #f48fb1;
+}
+  </style>
+  <!-- PASSWORD LOCK (custom modal) -->
+<style>
+  /* Password modal & overlay (copy into your CSS area if you prefer) */
+  #pw-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+  }
+  #pw-box {
+    background: #fff;
+    padding: 22px;
+    border-radius: 10px;
+    width: 320px;
+    box-shadow: 0 6px 30px rgba(0,0,0,0.35);
+    font-family: Arial, sans-serif;
+    text-align: center;
+  }
+  #pw-box h2 { margin: 0 0 8px; font-size: 18px; }
+  #pw-box p { margin: 0 0 14px; font-size: 13px; color: #444; }
+  #pw-input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 15px;
+    box-sizing: border-box;
+    margin-bottom: 12px;
+  }
+  #pw-submit {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: none;
+    background: #ff6b81;
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+  }
+  #pw-submit:active { transform: translateY(1px); }
+  #pw-error { color: #b00020; font-size: 13px; height: 18px; margin-top:8px; }
+  /* optional small cancel link */
+  #pw-cancel { display:block; margin-top:10px; color:#666; font-size:13px; text-decoration:underline; cursor:pointer; }
+</style>
+
+<div id="pw-overlay" aria-hidden="false">
+  <div id="pw-box" role="dialog" aria-modal="true" aria-label="Site access">
+    <h2>Enter secret code</h2>
+    <p>Type the secret to unlock this site. (clue:type date we met or your dob like my email)</p>
+    <input id="pw-input" type="password" autocomplete="off" placeholder="Secret code" />
+    <button id="pw-submit">Unlock</button>
+    <div id="pw-error" aria-live="polite"></div>
+    <div id="pw-cancel">Leave</div>
+  </div>
+</div>
+
+<script>
+  (function(){
+    // ===== CONFIGURE YOUR PASSWORDS HERE =====
+    const allowedPasswords = ['2862024','1952009']; // <-- change these
+    const maxAttempts = 6;
+    // =========================================
+
+    const overlay = document.getElementById('pw-overlay');
+    const input = document.getElementById('pw-input');
+    const submit = document.getElementById('pw-submit');
+    const err = document.getElementById('pw-error');
+    const cancel = document.getElementById('pw-cancel');
+
+    let attempts = 0;
+
+    // Ensure focus on load
+    input.focus();
+
+    function lockPage() {
+      // Prevent tabbing to page content while overlay is present
+      document.body.style.overflow = 'hidden';
+      // Optional: hide main content for extra safety (if your content isn't inside #protected-content)
+      const main = document.querySelector('main, #protected-content, body > :not(#pw-overlay)');
+      // we won't remove them; overlay blocks interaction
+    }
+
+    function unlock() {
+      overlay.remove();
+      document.body.style.overflow = ''; // restore scroll
+      // focus first interactive element if needed
+    }
+
+    function showDenied() {
+      // Replace page with Access Denied (stronger than leaving overlay)
+      document.documentElement.innerHTML = '<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Access Denied</title></head><body style="font-family:Arial,sans-serif;background:#fff8f0;display:flex;align-items:center;justify-content:center;height:100vh;margin:0"><div style="text-align:center;color:#333"><h1>Access Denied</h1><p>You do not have permission to view this page.</p></div></body>';
+    }
+
+    function checkPw() {
+      const val = input.value || '';
+      attempts++;
+      if (allowedPasswords.includes(val)) {
+        unlock();
+        return;
+      }
+      if (attempts >= maxAttempts) {
+        showDenied();
+        return;
+      }
+      // keep overlay and show error
+      err.textContent = 'Incorrect secret. Attempts left: ' + (maxAttempts - attempts);
+      input.value = '';
+      input.focus();
+    }
+
+    // handle enter key
+    input.addEventListener('keydown', function(e){
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        checkPw();
+      }
+    });
+
+    submit.addEventListener('click', function(e){
+      e.preventDefault();
+      checkPw();
+    });
+
+    // optional: allow a visible "Leave" that shows denied if clicked
+    cancel.addEventListener('click', function(){
+      showDenied();
+    });
+
+    // prevent clicks on overlay from dismissing it
+    overlay.addEventListener('click', function(e){
+      // clicking outside the box does nothing
+      if (e.target === overlay) {
+        // keep focus on input
+        input.focus();
+      }
+    });
+
+    // trap focus inside modal (basic)
+    document.addEventListener('focus', function(e){
+      if (!overlay.parentNode) return;
+      if (!overlay.contains(e.target)) {
+        e.stopPropagation();
+        input.focus();
+      }
+    }, true);
+
+    lockPage();
+  })();
+</script>
+
+</head>
+<!-- Romantic Popup -->
+<div id="romanticPopup" class="popup-overlay">
+  <div class="popup-box">
+    <h2>Welcome to Bonatland 💌</h2>
+    <p>Hay Allybobo, Do you love me?</p>
+    <button onclick="startMusic()" class="popup-play-btn">Nayan you are idiot</button>
+  </div>
+</div>
+<body>
+  <!-- Floating Music Button -->
+  <button class="music-btn" id="musicToggle" onclick="toggleMusic()">⏸️</button>
+  <audio id="bgMusic" autoplay loop>
+    <source src="homemusic.mp3" type="audio/mpeg">
+  </audio>  <!-- Hamburger Icon -->  <div class="menu-icon" id="menuIcon">☰</div>
+  <div id="menu-container"></div>  <!-- Header -->  <header class="header">
+    <h1 class="headline">💖Bonatland💖</h1>
+    <p class="subheading">🫵A Special Place, just for us🥹</p>
+    <p class="since">We’ve been together since <strong>28 June 2024</strong></p>
+    <div class="timer-box">
+      <div>Time since we are together</div>
+      <div id="timer" class="timer-value"></div>
+    </div>
+  </header>  <!-- Main -->  <main class="main">
+    <!-- Section 1: Hero Image -->
+    <div class="hero-image">
+      <img src="homebanner.jpg" alt="Us" class="hover-anim" />
+    </div><!-- Section 2: Intro Card -->
+<div class="intro-card hover-anim">
+  <h2>It is for you Ally</h2>
+  <p>This website got everything about us!!!. After you deleted our dc server 🙄🙄 and made me delete our stuff from one drive 😡.. here is the permanent solution for that 😎 hah. Whenever you miss us or wanna go through our memories, come here owk. It have a menu you can navigate with, also our old gifts are here. And I'll slowly make it better, this is our one stop destination 😂 And that ALLY REPLY page is for yk titanium alloy shit, I dont need to put it on bio or something now, or maybe sometimes I can put it in bio too hahhs. Anyways look around, and see what else this website got for you 🥹❤️</p>
+</div>
+
+<!-- Section 3: Quotes Section -->
+<div class="quotes-section hover-anim">
+  <h3>Our Quotes 🗣️</h3>
+  <blockquote id="quote">“sticking together 24/7”</blockquote>
+</div>
+
+  </main>  <!-- Footer -->  <footer class="footer">
+    <p>I love you Ally, Forever & Always 💌</p>
+  </footer>  <!-- Scripts -->  <script>
+    // Timer
+    function updateTimer() {
+      const startDate = new Date("June 28, 2024 00:00:00").getTime();
+      const now = new Date().getTime();
+      let diff = now - startDate;
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      diff %= (1000 * 60 * 60 * 24);
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      diff %= (1000 * 60 * 60);
+      const minutes = Math.floor(diff / (1000 * 60));
+      diff %= (1000 * 60);
+      const seconds = Math.floor(diff / 1000);
+
+      const timer = document.getElementById("timer");
+      if (timer) {
+        timer.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+      }
+    }
+    setInterval(updateTimer, 1000);
+    updateTimer();
+
+    // Music toggle
+    const bgMusic = document.getElementById("bgMusic");
+    const musicToggle = document.getElementById("musicToggle");
+    function toggleMusic() {
+      if (bgMusic.paused) {
+        bgMusic.play();
+        musicToggle.innerText = '⏸️';
+      } else {
+        bgMusic.pause();
+        musicToggle.innerText = '▶️';
+      }
+    }
+
+    // Quotes rotator
+    const quotes = [
+      "“sticking together 24/7”",
+      "“bonat”",
+      "“Leave me alone” - Ally"
+    ];
+    let quoteIndex = 0;
+    setInterval(() => {
+      quoteIndex = (quoteIndex + 1) % quotes.length;
+      document.getElementById("quote").innerText = quotes[quoteIndex];
+    }, 20000);
+
+    // Load shared menu and then attach toggle and submenu logic
+    fetch("menu.html")
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById("menu-container").innerHTML = data;
+        document.getElementById("menuIcon").addEventListener("click", () => {
+          const menu = document.getElementById("sideMenu");
+          if (menu) menu.classList.toggle("show");
+        });
+
+        // Submenu toggle logic
+        const submenuLinks = document.querySelectorAll('.has-submenu > a');
+        submenuLinks.forEach(link => {
+          link.addEventListener('click', (e) => {
+            e.preventDefault();
+            link.parentElement.classList.toggle('open');
+          });
+        });
+      });
+      
+      function startMusic() {
+  bgMusic.play();
+  musicToggle.innerText = '⏸️';
+  closePopup();
+}
+
+function closePopup() {
+  document.getElementById('romanticPopup').style.display = 'none';
+}
+
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('romanticPopup').style.display = 'flex';
+  }, 400); // a little delay for smooth appearance
+});
+  </script></body>
+</html>
