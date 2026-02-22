@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Notes</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root{
+  --matcha:#9fce8a;
+  --matcha-dark:#7ead6d;
+  --soft:#f5f1f7;
+  --pink:#ff9fc8;
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family: "Poppins", sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body{
+  background:#dcdcdc;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  overflow:hidden;
+}
+
+.phone{
+  width:380px;
+  height:780px;
+  background:#fff;
+  border-radius:32px;
+  box-shadow:0 20px 40px rgba(0,0,0,0.2);
+  position:relative;
+  overflow:hidden;
+}
+
+/* Soft background for notes */
+.app-bg{
+  position:absolute;
+  inset:0;
+  background:var(--soft);
+  z-index:0;
+}
+
+/* STATUS BAR (same as index) */
+.statusbar{
+  position:absolute;
+  top:0;
+  width:100%;
+  height:46px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:0 14px;
+  color:#2c2c2c;
+  font-size:15px;
+  z-index:20;
+}
+
+/* NOTIFICATION SHADE (same as index) */
+.notif-shade{
+  position:absolute;
+  left:0;
+  right:0;
+  top:0;
+  height:58%;
+  background:#ffffffee;
+  backdrop-filter: blur(10px);
+  border-bottom-left-radius:26px;
+  border-bottom-right-radius:26px;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.15);
+  transform: translateY(-100%);
+  transition: transform 260ms cubic-bezier(.2,.9,.3,1);
+  z-index:19;
+  pointer-events:none;
+  padding:18px;
+}
+
+.notif-shade.open{
+  transform: translateY(0);
+  pointer-events:auto;
+}
+
+.shade-handle{
+  width:55px;
+  height:6px;
+  background:#cfcfcf;
+  border-radius:10px;
+  margin:auto;
+}
+
+/* MUSIC CONTROLS (same) */
+.music-controls{
+  margin-top:20px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  background:#f2f7ea;
+  border-radius:14px;
+  padding:14px;
+  width:100%;
+  box-shadow:0 4px 10px rgba(0,0,0,0.05);
+}
+
+#trackTitle{
+  font-size:14px;
+  color:#3f3f3f;
+}
+
+.music-btn{
+  width:50px;
+  height:50px;
+  background:var(--matcha);
+  border-radius:14px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size:22px;
+  color:white;
+  cursor:pointer;
+  user-select:none;
+}
+
+.progress-wrap{
+  height:7px;
+  background:#d3e9cd;
+  border-radius:10px;
+  margin-top:5px;
+  overflow:hidden;
+}
+
+#progressBar{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg, var(--matcha-dark), var(--pink));
+}
+
+/* NOTES PAGE CONTENT */
+.notes-wrapper{
+  position:absolute;
+  top:60px;
+  bottom:70px;
+  left:0;
+  right:0;
+  padding:18px;
+  overflow-y:auto;
+  z-index:1;
+}
+
+.notes-grid{
+  display:grid;
+  grid-template-columns:repeat(2, 1fr);
+  gap:16px;
+}
+
+.note-card{
+  background:white;
+  padding:12px;
+  border-radius:14px;
+  min-height:120px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.08);
+  cursor:pointer;
+  overflow:hidden;
+}
+
+.note-title{
+  font-size:15px;
+  font-weight:600;
+  margin-bottom:6px;
+}
+
+.note-preview{
+  font-size:13px;
+  color:#555;
+}
+
+/* POPUP NOTE VIEW */
+.popup{
+  position:absolute;
+  inset:0;
+  background:#00000066;
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:50;
+}
+
+.popup-box{
+  width:80%;
+  background:white;
+  padding:18px;
+  border-radius:16px;
+  box-shadow:0 8px 30px rgba(0,0,0,0.2);
+}
+
+.popup-close{
+  text-align:right;
+  font-size:20px;
+  cursor:pointer;
+}
+
+.popup-title{
+  font-size:18px;
+  font-weight:700;
+  margin-bottom:8px;
+}
+
+.popup-content{
+  font-size:14px;
+  color:#444;
+}
+
+.notif-title {
+  width:100%;
+  display:flex;
+  justify-content:center;
+  margin-top:16px;
+  font-weight:600;
+  color:#444;
+}
+
+/* DOCK */
+.dock{
+  position:absolute;
+  bottom:0;
+  left:0;
+  width:100%;
+  height:70px;
+  display:flex;
+  justify-content:center;
+  gap:40px;
+  align-items:center;
+  background:#ffffffdd;
+  backdrop-filter:blur(6px);
+  z-index:20;
+}
+
+.nav-btn{
+  width:60px;
+  height:60px;
+  background:#ffffff;
+  border-radius:20px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size:26px;
+  box-shadow:0 6px 16px rgba(0,0,0,0.1);
+  cursor:pointer;
+}
+
+.message-notif {
+  margin-top: 16px;
+  background: #e7eee2;
+  padding: 12px 14px;
+  border-radius: 12px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+  font-size: 14px;
+  color: #333;
+}
+
+.message-sender {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.message-text {
+  opacity: 0.85;
+}
+</style>
+</head>
+
+<body>
+
+<div class="phone" id="phone">
+
+  <div class="app-bg"></div>
+
+  <!-- NOTIFICATION SHADE -->
+  <div class="notif-shade" id="notifShade">
+    <div class="shade-handle"></div>
+    <div class="notif-title">Notifications</div>
+
+    <div class="music-controls">
+      <div style="flex:1">
+        <div id="trackTitle">Note App Ambience</div>
+        <div class="progress-wrap"><div id="progressBar"></div></div>
+      </div>
+      <div id="playPauseBtn" class="music-btn">▶️</div>
+    </div>
+    <!-- Inside .notif-shade, under .music-controls -->
+<div class="message-notif">
+  <div class="message-sender">Nayan Husbanto</div>
+  <div class="message-text">I love you ally</div>
+</div>
+  </div>
+
+  <!-- STATUS BAR -->
+  <div class="statusbar">
+    <span id="statusTime"></span>
+    <div>
+      <span>A❤️N</span>
+      <span>🛜</span>
+    </div>
+  </div>
+
+  <!-- NOTES CONTENT -->
+  <div class="notes-wrapper">
+    <div class="notes-grid">
+
+      <!-- SAMPLE NOTE (you can duplicate/delete) -->
+      <div class="note-card" onclick="openNote('Read if u mad','Ok if u are mad I think u have all right to be mad, Like shi I be mad at myself too. Im too moody sometimes. Sometimes too aggressive. Sometimes too toxic and heartless and ignorant to your problems. I cant do anything about it except making up to you and changing my ways thats all. Im sorry ok, forgive me for being a very bad and awful bf. What is my punishments for this? kell? kell me? ok kell me then. Ill wait for my kell.')">
+        <div class="note-title">Read if u mad</div>
+        <div class="note-preview">Ok if u are mad I think u have all right to be mad, Like shi I be mad at myself too.</div>
+      </div>
+
+      <div class="note-card" onclick="openNote('Read if u no mad','if u arent mad, lets breed. Yeah lets straight up breed rn, I got my pre cum as lube ready. I just wanna push it inside you, ik u wont even say no. because Im your female dog and female dog means bite, bite? yeahhhh Ill bite u for being a bully to me btw. U pmo, then u mindrape me, then u ask me, why are u mad. u wanna know why? because I want your ass on my face and u are so tagal for doing it. You should teleport to me if possible, if no then dont tf. Ye, u heard me. Fly to me rn.')">
+        <div class="note-title">Read if u no mad</div>
+        <div class="note-preview">if u arent mad, lets........</div>
+      </div>
+
+      <div class="note-card" onclick="openNote('17th Monthversary','Happy 17th Monthversary baby, we now have spent 17 months together, its almost 1 and half an year. I hope you enjoyed these times because... we about to make more of these in up and coming days owk. This time I made ts shit, lots of shit happened while making it 😊😊😊 dat pmo but end of day its working owk, check everything, theres something for u everywhere. U matter to me so I do all ts for u because u are special to me naman. Tell me, tell me karo gimme your thoughts here to me. Ik its nothing much but better than staying empty handed ok, I lab u bobonatur. forgive owk and lab.')">
+        <div class="note-title">17th Monthversary</div>
+        <div class="note-preview">Happy 17th Monthversary baby, we now have</div>
+      </div>
+      
+      <div class="note-card" onclick="openNote('Love Letter','When my phone is dying, I make sure u get to know that my phone is gonna see god until it gets revived up again. I cant stay a minute without your bothering, its either you bothering me or me bothering you or me planning to what bother u about later. If Covid came back again, Ill use your lips as my mask 😂😂 ok that wasnt very romantic. I love being w you. I mean yeahhh sometimes Im pushing u away but even in that I look back at u if u fighting back or nahhh. If nahhh Ill bother again. You are literally my wife. who Ill touch, wdim will, Im doing it everyday hah. I love you ok, I love you physically, emotionally, mentally, spiritually, ally ok. Stay w me, and Ill give u my weenus. I hope we stay together forever. I would love that baby.')">
+        <div class="note-title">Love Letter</div>
+        <div class="note-preview">Empty, Nothing</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- POPUP -->
+  <div class="popup" id="popup">
+    <div class="popup-box">
+      <div class="popup-close" onclick="closePopup()">✖</div>
+      <div class="popup-title" id="popTitle"></div>
+      <div class="popup-content" id="popContent"></div>
+    </div>
+  </div>
+
+  <!-- DOCK -->
+  <div class="dock">
+    <div class="nav-btn" onclick="history.back()">⬅</div>
+    <div class="nav-btn" onclick="window.location='17th.html'">🏠</div>
+  </div>
+
+  <!-- AUDIO -->
+  <audio id="bgMusic" src="17music2.mp3" loop preload="auto"></audio>
+</div>
+
+<script>
+/* TIME */
+function updateTime(){
+  const t = new Date();
+  let h = t.getHours();
+  let m = t.getMinutes();
+  if(m < 10) m = "0"+m;
+  document.getElementById("statusTime").textContent = h + ":" + m;
+}
+setInterval(updateTime, 1000);
+updateTime();
+
+/* MUSIC */
+const music = document.getElementById("bgMusic");
+const playBtn = document.getElementById("playPauseBtn");
+const progress = document.getElementById("progressBar");
+
+playBtn.onclick = ()=>{
+  if(music.paused){
+    music.play();
+    playBtn.textContent="⏸️";
+  } else {
+    music.pause();
+    playBtn.textContent="▶️";
+  }
+};
+
+music.ontimeupdate = ()=>{
+  if(music.duration){
+    progress.style.width = (music.currentTime/music.duration)*100 + "%";
+  }
+};
+
+/* Tap progress bar */
+document.querySelector(".progress-wrap").onclick = e=>{
+  const rect = e.target.getBoundingClientRect();
+  const pct = (e.clientX - rect.left) / rect.width;
+  music.currentTime = pct * music.duration;
+};
+
+/* SWIPE NOTIF */
+const notif = document.getElementById("notifShade");
+const phone = document.getElementById("phone");
+let startY = 0;
+
+phone.addEventListener("touchstart", e=>{
+  startY = e.touches[0].clientY;
+});
+phone.addEventListener("touchmove", e=>{
+  const d = e.touches[0].clientY - startY;
+  if(d > 40) notif.classList.add("open");
+  if(d < -40) notif.classList.remove("open");
+});
+
+/* POPUP */
+function openNote(t,c){
+  document.getElementById("popTitle").textContent = t;
+  document.getElementById("popContent").textContent = c;
+  document.getElementById("popup").style.display="flex";
+}
+function closePopup(){
+  document.getElementById("popup").style.display="none";
+}
+
+const bgMusic = document.getElementById("bgMusic");
+bgMusic.loop = true;
+
+// Prevent auto-play block on load
+let musicUnlocked = false;
+
+function tryPlayMusic() {
+    if (!musicUnlocked) {
+        bgMusic.play()
+            .then(() => { musicUnlocked = true; })
+            .catch(() => { /* still locked; will retry */ });
+    }
+}
+
+// Try to play automatically on page load (may fail if no user interaction yet)
+window.addEventListener("load", () => {
+    tryPlayMusic();
+});
+
+// ANY interaction unlocks playback
+["click", "touchstart", "keydown"].forEach(evt => {
+    document.addEventListener(evt, () => {
+        tryPlayMusic();
+    }, { once:false });
+});
+</script>
+
+</body>
+</html>
