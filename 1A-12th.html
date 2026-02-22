@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Happy 1st Anniversary</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&family=Poppins&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to bottom, #ffe3ec, #e6f5e6);
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      position: relative;
+    }
+    .menu-icon {
+      font-size: 24px;
+      cursor: pointer;
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      z-index: 1100;
+      background: #d5eadf;
+      padding: 0.3rem 0.6rem;
+      border-radius: 8px;
+    }
+    .header {
+      padding: 3rem 1rem 2rem;
+      background-color: #d5eadf;
+      text-align: center;
+      position: relative;
+    }
+    .headline {
+      font-family: 'Dancing Script', cursive;
+      font-size: 2rem;
+      color: #3a7e62;
+      margin: 0.5rem 0 0.2rem;
+    }
+    .subheading {
+      font-size: 1.1rem;
+      color: #5a8c79;
+      margin: 0;
+    }
+    .side-menu {
+      position: fixed;
+      top: 0;
+      left: -250px;
+      width: 220px;
+      height: 100%;
+      background-color: #fce4ec;
+      padding-top: 4rem;
+      transition: 0.3s;
+      z-index: 1000;
+      overflow-y: auto;
+      border-right: 2px solid #ffd1dc;
+    }
+    .side-menu.show {
+      left: 0;
+    }
+    .side-menu ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .side-menu li {
+      padding: 10px 20px;
+    }
+    .side-menu a {
+      text-decoration: none;
+      color: #3a7e62;
+      font-weight: bold;
+      display: block;
+    }
+    .submenu {
+      display: none;
+      padding-left: 15px;
+    }
+    .has-submenu > a::after {
+      content: " \25BC";
+      font-size: 0.8rem;
+    }
+    .has-submenu.open .submenu {
+      display: block;
+    }
+    .arrow-down {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #3a7e62;
+      transition: transform 0.3s ease;
+    }
+    .has-submenu.open .arrow-down {
+      transform: rotate(180deg);
+    }
+    .main {
+      padding: 2rem;
+      text-align: center;
+    }
+    .footer {
+      text-align: center;
+      padding: 1rem;
+      background-color: #e0f7fa;
+      font-size: 0.9rem;
+      color: #555;
+      margin-top: auto;
+    }
+    .cute-button, .kiss-button {
+      padding: 12px 25px;
+      font-size: 1.1rem;
+      background-color: #ffd1dc;
+      border: none;
+      border-radius: 20px;
+      color: #333;
+      cursor: pointer;
+      transition: transform 0.2s, background-color 0.3s;
+      font-family: 'Poppins', sans-serif;
+      box-shadow: 0 4px 10px rgba(255, 182, 193, 0.4);
+    }
+    .cute-button:hover, .kiss-button:hover {
+      background-color: #ffc0cb;
+      transform: scale(1.05);
+    }
+    .fade {
+      animation: fadeIn 0.8s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .love-text {
+      font-family: 'Poppins', sans-serif;
+      color: #c2185b;
+      font-size: 2rem;
+    }
+    #kissImage img {
+      transition: transform 0.4s;
+    }
+    #kissImage img:hover {
+      transform: scale(1.1);
+    }
+    .emoji-effect {
+      position: absolute;
+      font-size: 1.5rem;
+      pointer-events: none;
+      animation: popOut 1s ease-out forwards;
+      z-index: 9999;
+    }
+    @keyframes popOut {
+      0% { opacity: 1; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-30px) scale(1.5); }
+    }
+    .kiss-animate {
+      animation: kissZoom 0.4s ease;
+    }
+    @keyframes kissZoom {
+      0% { transform: scale(1) rotate(0); }
+      50% { transform: scale(1.1) rotate(-5deg); }
+      100% { transform: scale(1) rotate(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="menu-icon" onclick="toggleMenu()">☰</div>
+  <div id="menu-container"></div>
+
+  <header class="header">
+    <h1 class="headline">Happy Anniversary<br>My Baby Ally</h1>
+    <p class="subheading">We didn't just finish 1st year together, We are also beginning the 2nd year😘😘🥰🥰😍❤️❤️❤️</p>
+  </header>
+
+  <main class="main">
+    <section id="love-section" style="text-align: center; margin-top: 2rem;">
+      <button id="loveBtn" class="cute-button">Touch me</button>
+
+      <div id="loveMessage" class="fade" style="display: none; margin-top: 1.5rem;">
+        <h2 class="love-text">I LOVE YOUUU SOOOOO MUCHHH BOBOOO ALLYNESS</h2>
+
+        <div id="loveLetter" class="fade" style="display: none; background-color: #fff0f5; padding: 1.2rem; margin: 1.2rem auto; max-width: 600px; border-radius: 16px;">
+          <p style="font-style: italic; color: #555;"><p>Hay</p><p>Hay</p><p>Hay</p><p>Hay, You there, stay. stay here. Ally, my ally, my sweet sweet (sometimes spicy) and most of time grumpy, I wanna say something to you. Ok you actually already know what I wanna say or maybe no 😂</p><p>HAPPY 1ST ANNIVERSARY ALLYYYYYYYY!!!!!!!!!</p><p>It's so crazy nigga, I really can't believe we are are together for 1 year now, I mean think about it w the amount of time we fight and shi like I never in my life thought I'll date someone like you for this long. Even when we just started I felt like ts would end in few weeks but instead our love just kept growing big and bigger and larger (like my dick). And here we are, on our 1 year anniversary together, I know you are surprised too probably. I mean yeah I agree we had our lows, where we fr felt our relationship is ending finally but now we think about jt, we be having moments like that a lot since we are together. Do you remember when you said you don't have any feelings anymore for first time? It was september I think 😂 and it just took 3 days, on 2nd day I was like yeah let's be friends then at night I'm showing true colors and bothering 😂😂😂😂 like alright I was kidding about let's being friends that was just yo calm yo ass down. and on next, 3rd day I planned a whole map to bring your feelings back and all we had to do was to play roblox hahshs and show some selfies.</p><p>Sometimes just think how we were before meeting eachother, and before talking w eachother, we barely interacted in that server. Like I fr didn't expect I'll find love in that goddam server and not w the weez ladyboy 😭😭baby yk even on our first night of our talking I still believed you are actually a ladyboy and like idk I was like idc actually I really was loving your vibe. Do you remember when we were talking for first time in dc dms and server, your vibes were really attracting me like yk, you talked w very hyper active ahh and same types of jokes as me like crude, freaky, and sometimes corny and cringy just like me and I said to myself woah this weez just like me fr. And when you added me for first time on insta. you showed me that Deepanshu 🙄🙄and said that's me. like nigga alright I'm just a deepanshu to you?? And even your freaky jokes and replies were like me like you were replying w same freak level as me 😭😭 your humor and freakyness fr the first things that attracted me towards you. Your personality, It's so unique, I have never met someone like you before and I don't I ever will. Maybe is that why I love you always, even when you are bobo sometimes. Then after few mins I was itching so I just texted and replied to your story “this was ur pfp on dc” and you were like “yesss” then nigga after that our replies were kinda slow at first because idk what you were doing but I was in noidea that time in TOD channel yapping w nami, adi and Ray and alcemist then we got too active together online at same time and we started yapping, my first message was on 9:11 pm and that was 11:41 pm for you.... that's when we actually started.... and we didn't stop, I really liked that feeling like yk slowly falling in love, we were flirting back to back w eachother and making jokes and laughing at eachother and bullying eachother too along w it and we also bullied other niggas and made targets. Nigga I remember laughing and giggling so much and trying to suppress my laugh so papa wouldn't wake up. You said your smile lines are getting worse from laughing this much 😭😭then we also taught eachother shit like I taught you about chapris and you taught me about jejemons like wow our cultures and country are so same. You also did some story time, you told me about your family and stuff I remember lying about om's age because I thought you will start liking him or something 🙏😭so I said he is 12 then like 2-3 days later when I got more comfortable w you I said ok he is actually 17. Bae do you also remember in early days you were always saying "voice reveal when" "voice reveal" 'boys rebel" 😭😭😭😭 and I was shy af so I always skipping. nigga yk sometimes I even had privacy but I'll not tell because ik you will ask for voice reveal but I was fr very shy w it. Nigga once I was reading our old chats like first month ahh and nigga I realized how dirty we talked before.... like every 3rd line was either a funny joke or freaky thing (or both sometimes 😂). That first month was something else fr. I was fully unemployed, you didn't have school. And we slowly falling in love and no fights or argument at all. I believe maybe it was because we didn't see eachother's flaws that time. like yk even though we were comfortable w eachother, we didn't show our true colors to eachother like 2-3 months layer our all flaws and toxic traits started to show up, we were even more comfortable, so comfortable niggas even started doing esex 😭😭🙏🙏 I wanna talk about this and shi latur in live fr.</p><p>This year meant a lot to me, this year as in this year w you. not new year 2024 or 2025 baka. Sometimes I believed you are like a lucky charm cuz imagine I was unemployed for so long and in just 1 month of meeting you, I got a job out of nowhere and idk believe it or not that whole time like when I met you and those first 2-3 months were some of best moments of my life, and not just that, even after that, I've been so much happy just because of a bobo girl named ally. hah are you smiling yet? no? ok continue reading 🙄👉.</p><p>You changed me a lot, like yk before I didn't even wash my dick other than shower or brushed my teeth at night, but you taught me to do that. and nigga I started to take more care of my hygiene just for you ok. Sometimes you taught me patience by playing w it 🙄 I'm not bragging brah but I don't think there's another man who handle you other than your dad but you can't marry yo dad so there's only one way left here 😜😜. Many other countless ways you have helped me physically, mentally and emotionally without you knowing it. Even your simple cute good morning messages brighten my morning a lot, even just simple you spamming me about random stuff makes me feel happy, you don't realise but I love that a lot. Trust me or not, You can make me do anything after showing your selfie cuz nigga you are so beautiful, my heart sometimes be beating extra faster when I'm looking at your face like nigga, I can't believe you are mine. spoil me w your pictures because if not me then who you are saving your face for 👍 ok. I love your tits (alright nigga shut yo ahh about that edited shi don't start that again) what was I saying, yeah I love your tits a lot, even your pussy and your ass, you body is work of art baby. Even your yummy stomach and pretty face. But yk what I find even more equally attractive? it's your efforts, small and big both. I really feel loved when you make efforts to make me happy not because I made you happy or because are my gf, just simply you do things that I didn't ask for but you still did because you wanna see me happy. I really find that attractive more than any tits or ass or face or whatever you think I like. You know eveytime you make something for me, I save it like it's a colorful stone I found and it's my treasure forever. I starts exploding from Inside because even though you torture me like bdsm you can get really sweet. Sometimes you get me teary eyes not because you are hurting me, just simply because you did all that, just for me without expecting something in return. I love your random small stuff you make for me, I love your occasional edits sometimes you make about us. I love when you send me selfie (and sometimes doods) without me asking for it, out of nowhere. Ally trust me, I feel really happy in a way I can't explain..You make me feel that way. My heart and head almost starts screaming that yes, you are my wife.</p><p>I love your these efforts. I love your this humor you got that never fails to make me laugh even at my worst moods, you switch it up immediately. I love your this face that be making me blush like a gay nigga sometimes fr I'm not joking. I even got boner sometimes looking at you, yeah go ahead call me weird and pervert idc 👍. I really love your smoking hot hourglass body. You get my dick up so fast, Sometimes nigga be giving me boner in public too and office. remember when I got home once and you sent me pic like sitting in shirt and you were like pulling it back tight nigga mafr you my dark knight rise, it was so hard nigga like it was looking even longer too 😭🙏.  and we had crazy esex after that. And nigga your ass gave me strong boner right after coming, I had to cum again 😭😭😭. I love you fr pala... sexually, romantically, spiritually, in every allyway, I love you.</p><p>I love your this soft side you have, other than just being sigma and nonchalant, you act very emotion less and like yk very yeahh I'm strong girl but I can see through you. You wanna be loved too, I hope you feel it w me and if no, lemme know so I can do something about it. You be so smart at school, like nigga you will be scared like "oh no I'll fail test" and you be either getting perfect marks or 95+ always. See, you are really sharp and I wanna give that to our kids so share your genes 🙏. Your all these skills and hobbies like art and sports and gym, all of it attracted me towards you. Till this day you still make me check for your messages every few mins when I'm free like how you got me back reading your messages whenever you went offline.</p><p>Through all these mistakes You & I made, we found ways to work on them and find ways to love eachother and made eachother happy. You know ally, nothing will make me more happy than hearing "let's talk and fix this" from you instead of "Let's break up". Sometimes when I take a step back, like when I delete my acc or not talk, it's not because I don't care or I'm losing feelings or something or whatever, it's just I wanna feel some love too, I wanna know too how much far you will go for me, or to see if I'm really that easy to let go of. to see if you will fight for me. Sometimes I just take a step back and you comeback to me, Ally that makes me happy. You make me happy, more than anything in this world. You are my love, universe put us together, to fuck, marry and fuck and other important stuff too. I'm sorry sometimes I'm a disappointment to you, I'm a disappointment for myself as well. I'm sorry for all mistakes I made. I hope you see how hard I worked on fixing my mistakes, I hope you notice my efforts. I hope you feel my love as well. Fighting or not, yapping or not, or whatever situation we in, remember. I love you so much my baby gol, My Ally, Allyssa Luis M Manuel.</p><p>I loved this whole year w you, you made it better. You are a big part of my life. And I thank god for bringing you in here and keeping us together in times where most fails and we didn't because we are sigma. It was just starting, 2nd year of us has started. I hope we achieve our goals we wanna achieve, Let's make some promises and goals and things to do, like a bucket list of things we will do in this year. Let's love eachother more, let's learn and grow. Let's try to do better than before without repeating past mistakes. I love you with my whole heart, And I wish we get married in future and stick together 24/7 forever. 💌❤️</p>
+
+          <button id="kissBtn" class="kiss-button">Kiss me now🥹</button>
+
+          <div id="kissImage" class="fade" style="display: none; margin-top: 1rem;">
+            <img src="kiss1A.jpg" alt="Kiss"
+              style="max-width: 500px; width: 100%; height: auto; border-radius: 0; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+            <p style="margin-top: 0.5rem; color: #e91e63;">kiss kiss besosing muah!!!!!!!!</p>
+          </div>
+        </div>
+      </div>
+      <!-- Video Play Button -->
+<div style="text-align: center; margin: 2rem;">
+  <button class="cute-button" onclick="openModal()">Kiss here</button>
+</div>
+
+<!-- Video Modal -->
+<div id="videoModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.7); z-index:9999;">
+  <div style="position:relative; margin:5% auto; padding:1rem; background:#111; width:90%; max-width:700px; border-radius:10px;">
+    <span onclick="closeModal()" style="position:absolute; top:10px; right:20px; font-size:28px; color:white; cursor:pointer;">&times;</span>
+    <video id="popupVideo" src="kiss1A.mp4" controls autoplay style="width:100%; border-radius:8px;"></video>
+  </div>
+</div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>I love you Ally, Forever & Always 💌</p>
+  </footer>
+
+  <script>
+  function toggleMenu() {
+    document.getElementById("sideMenu").classList.toggle("show");
+  }
+
+  function toggleSubmenu(event, el) {
+    event.preventDefault();
+    el.parentElement.classList.toggle("open");
+  }
+
+  fetch("menu.html")
+    .then(res => res.text())
+    .then(data => {
+      document.getElementById("menu-container").innerHTML = data;
+    });
+
+  const loveBtn = document.getElementById("loveBtn");
+  const loveMessage = document.getElementById("loveMessage");
+  const loveLetter = document.getElementById("loveLetter");
+
+  loveBtn.addEventListener("click", (e) => {
+    const isVisible = loveMessage.style.display === "block";
+
+    if (!isVisible) {
+      loveMessage.style.display = "block";
+      setTimeout(() => loveLetter.style.display = "block", 800);
+    } else {
+      loveLetter.style.display = "none";
+      loveMessage.style.display = "none";
+    }
+
+    showEmojisAroundElement(loveBtn, ['💦', '💦', '💦', '💦']);
+  });
+
+  const kissBtn = document.getElementById("kissBtn");
+  const kissImage = document.getElementById("kissImage");
+  const kissImgTag = kissImage.querySelector("img");
+
+  kissBtn.addEventListener("click", (e) => {
+    kissImage.style.display = "block";
+
+    kissImgTag.classList.add("kiss-animate");
+    setTimeout(() => kissImgTag.classList.remove("kiss-animate"), 400);
+
+    showEmojisAroundElement(kissBtn, ['❤️', '❤️', '❤️', '❤️']);
+    showEmojisAroundElement(kissImgTag, ['❤️', '❤️', '❤️', '❤️']);
+  });
+
+  function showEmojisAroundElement(target, emojis) {
+  const rect = target.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+
+  emojis.forEach(() => {
+    const emojiSpan = document.createElement("span");
+    emojiSpan.classList.add("emoji-effect");
+    emojiSpan.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+
+    const angle = Math.random() * 2 * Math.PI;
+    const radius = 20 + Math.random() * 20; // smaller radius
+    const offsetX = Math.cos(angle) * radius;
+    const offsetY = Math.sin(angle) * radius;
+
+    emojiSpan.style.left = `${window.scrollX + centerX + offsetX}px`;
+    emojiSpan.style.top = `${window.scrollY + centerY + offsetY}px`;
+
+    document.body.appendChild(emojiSpan);
+    setTimeout(() => emojiSpan.remove(), 1000);
+  });
+}
+
+function openModal() {
+    const modal = document.getElementById("videoModal");
+    const video = document.getElementById("popupVideo");
+    modal.style.display = "block";
+    video.currentTime = 0;
+    video.play();
+  }
+
+  function closeModal() {
+    const modal = document.getElementById("videoModal");
+    const video = document.getElementById("popupVideo");
+    modal.style.display = "none";
+    video.pause();
+  }
+
+  // Optional: close modal when clicking outside the modal content
+  window.onclick = function(event) {
+    const modal = document.getElementById("videoModal");
+    const video = document.getElementById("popupVideo");
+    if (event.target === modal) {
+      modal.style.display = "none";
+      video.pause();
+    }
+  };
+</script>
+</body>
+</html>
