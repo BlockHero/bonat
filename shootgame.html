@@ -1,0 +1,589 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+<title>Kell World</title>
+<style>
+  :root{--bg:#061428;--panel:rgba(255,255,255,0.06);--accent:#19f;}
+  html,body{height:100%;margin:0;background:var(--bg);font-family:Inter,system-ui,Segoe UI,Roboto,Arial}
+  #wrap{position:relative;height:100vh;overflow:hidden}
+  canvas{display:block;background:linear-gradient(#031220,#061428);width:100%;height:100%}
+  /* HUD */
+  .hud{position:absolute;left:12px;top:12px;color:#fff;z-index:30}
+  #scoreUI{font-weight:700}
+  #healthUI{margin-top:8px}
+  /* Menu */
+  #menu{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:40;background:linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.7))}
+  .menuCard{background:linear-gradient(180deg,#071a2b,#081a2a);padding:22px;border-radius:14px;color:#eaf6ff;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,0.6)}
+  .menuCard h1{margin:0 0 8px;font-size:24px}
+  .btn{margin-top:12px;padding:12px 22px;border-radius:10px;border:0;background:var(--accent);color:white;font-weight:800;font-size:16px}
+  /* Joysticks */
+  .joy{position:fixed;width:140px;height:140px;border-radius:50%;background:var(--panel);touch-action:none;z-index:25;display:flex;align-items:center;justify-content:center}
+  .stick{width:58px;height:58px;border-radius:50%;background:rgba(255,255,255,0.22);transform:translate(0,0)}
+  #joyMove{left:18px;bottom:28px}
+  #joyAim{right:18px;bottom:28px}
+  /* small labels */
+  .label{position:absolute;left:12px;bottom:12px;color:rgba(255,255,255,0.28);font-size:12px;z-index:35}
+  /* responsive */
+  @media(min-width:900px){ .joy{width:180px;height:180px}.stick{width:80px;height:80px} }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <canvas id="game"></canvas>
+
+  <div class="hud" aria-hidden="true">
+    <div id="scoreUI">Score: 0</div>
+    <div id="healthUI">Health: 3</div>
+    <div id="waveUI" style="margin-top:8px;color:rgba(255,255,255,0.85)">Wave: 1</div>
+    <div id="hud">
+  <div>Score: <span id="score">0</span></div>
+  <div>Health: <span id="health">3</span></div>
+  <div>Wave: <span id="wave">1</span></div>
+
+  <!-- Back to home button -->
+  <button id="homeBtn" style="margin-top:12px; padding:8px 16px; border-radius:10px; border:none; background: #9fce8a; color:white; font-weight:600; cursor:pointer;">
+    🏠
+  </button>
+</div>
+  </div>
+
+  <div id="menu">
+    <div class="menuCard">
+      <h1>Kell World</h1>
+      <div style="opacity:0.9">Left joystick - Move, Right joystick - Aim & Shoot</div>
+      <button id="startBtn" class="btn">START</button>
+    </div>
+  </div>
+
+  <div id="joyMove" class="joy" aria-hidden="true"><div id="stickMove" class="stick"></div></div>
+  <div id="joyAim" class="joy" aria-hidden="true"><div id="stickAim" class="stick"></div></div>
+
+  <div class="label">Tip: use both sticks simultaneously</div>
+</div>
+
+<!-- Background music -->
+<audio id="gameMusic" src="17music6.mp3" loop></audio>
+
+<script>
+/* ========= Setup ========= */
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+function resize(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+window.addEventListener('resize', resize);
+resize();
+
+/* ========= Game state ========= */
+let running = false;
+let score = 0;
+let wave = 1;
+let enemiesToSpawn = 8;
+let spawnedEnemies = 0;
+let bossAlive = false;
+let health = 3;
+
+const player = {
+  x: canvas.width/2,
+  y: canvas.height - 160,
+  size: 26,
+  speed: 320,
+  shootCD: 0
+};
+
+let bullets = [];      // player bullets
+let enemyBullets = []; // enemy bullets
+let enemies = [];
+let particles = [];
+
+let last = 0;
+let enemyTimer = 0;
+
+/* ========= Utility ========= */
+const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
+const rand = (a,b)=>a + Math.random()*(b-a);
+
+/* ========= Joysticks (pointer events robust for simultaneous) ========= */
+function makeJoystick(boxId, stickId, onUpdate){
+  const box = document.getElementById(boxId);
+  const stick = document.getElementById(stickId);
+  let pointerId = null;
+  let center = {x: box.offsetLeft + box.clientWidth/2, y: box.offsetTop + box.clientHeight/2};
+  // update center on resize/scroll
+  const recomputeCenter = ()=> center = {x: box.offsetLeft + box.clientWidth/2, y: box.offsetTop + box.clientHeight/2};
+  window.addEventListener('resize', recomputeCenter);
+  window.addEventListener('scroll', recomputeCenter);
+
+  box.addEventListener('pointerdown', e=>{
+    box.setPointerCapture(e.pointerId);
+    pointerId = e.pointerId;
+    recomputeCenter();
+    onUpdate(0,0,true);
+  });
+
+  box.addEventListener('pointermove', e=>{
+    if(pointerId !== e.pointerId) return;
+    let dx = e.clientX - center.x;
+    let dy = e.clientY - center.y;
+    const max = Math.min(box.clientWidth, box.clientHeight) * 0.36;
+    const d = Math.hypot(dx,dy);
+    if(d > max){ dx *= max/d; dy *= max/d; }
+    stick.style.transform = `translate(${dx}px,${dy}px)`;
+    onUpdate(dx / max, dy / max, true);
+  });
+
+  function end(e){
+    if(pointerId === null) return;
+    if(e.pointerId !== pointerId) return;
+    box.releasePointerCapture(pointerId);
+    pointerId = null;
+    stick.style.transform = 'translate(0,0)';
+    onUpdate(0,0,false);
+  }
+  box.addEventListener('pointerup', end);
+  box.addEventListener('pointercancel', end);
+
+  // mouse fallback (works with pointers anyway), nothing extra needed
+}
+
+/* Movement and Aim state */
+let moveX = 0, moveY = 0, moveActive = false;
+let aimX = 0, aimY = -1, aimActive = false;
+
+makeJoystick('joyMove','stickMove', (x,y,active)=>{
+  moveX = x; moveY = y; moveActive = !!active;
+});
+makeJoystick('joyAim','stickAim', (x,y,active)=>{
+  if(active){
+    if(Math.abs(x) < 0.08 && Math.abs(y) < 0.08){
+      // tiny jitter — keep last aim
+    } else {
+      aimX = x; aimY = y;
+    }
+    aimActive = true;
+  } else {
+    aimActive = false;
+    aimX = 0; aimY = -1; // default up
+  }
+});
+
+/* ========= Spawning & enemies ========= */
+function spawnEnemy(){
+  const margin = 40;
+  enemies.push({
+    x: margin + Math.random()*(canvas.width - margin*2),
+    y: -40,
+    size: 22,
+    speed: 120 + wave*10,
+    hp: 1,
+    canShoot: Math.random() < 0.18,
+    shootTimer: rand(1.2,3.0)
+  });
+  spawnedEnemies++;
+}
+
+function spawnBoss(){
+  enemies.push({
+    x: canvas.width/2,
+    y: -160,
+    size: 86,
+    speed: 60,
+    hp: 25 + (wave-1)*10,
+    boss: true,
+    attackTimer: 1.6,
+    dashTimer: 3.0,
+    state: 'enter',
+    phase: 1
+  });
+  bossAlive = true;
+}
+
+function spawnEnemyBullet(x,y,dx,dy,speed=240){
+  enemyBullets.push({x,y,dx,dy,speed,ttl:6});
+}
+
+function spawnPlayerBullet(x,y,dx,dy){
+  bullets.push({x,y,dx,dy,speed:520,life:2.2});
+}
+
+/* ========= Particles ========= */
+function spawnParticles(x,y,count=10,col='yellow'){
+  for(let i=0;i<count;i++){
+    particles.push({
+      x,y,
+      vx:(Math.random()-0.5)*260,
+      vy:(Math.random()-0.5)*260,
+      r:2 + Math.random()*4,
+      ttl:0.4 + Math.random()*0.6,
+      col
+    });
+  }
+}
+function updateParticles(dt){
+  for(let i=particles.length-1;i>=0;i--){
+    const p = particles[i];
+    p.x += p.vx*dt; p.y += p.vy*dt;
+    p.vx *= 0.98; p.vy *= 0.98; p.ttl -= dt;
+    if(p.ttl <= 0) particles.splice(i,1);
+  }
+}
+
+/* ========= Player damage & game control ========= */
+function damagePlayer(){
+  spawnParticles(player.x, player.y, 14, 'white');
+  health = Math.max(0, health-1);
+  document.getElementById('healthUI').innerText = 'Health: ' + health;
+  if(health <= 0) endGame();
+}
+
+function endGame(){
+  running = false;
+  enemies = []; bullets = []; enemyBullets = []; particles = [];
+  bossAlive = false;
+  document.getElementById('menu').style.display = 'flex';
+  document.getElementById('startBtn').innerText = 'RESTART';
+}
+
+/* ========= Update loop ========= */
+function update(dt){
+  // player movement (smooth)
+  player.x += moveX * player.speed * dt;
+  player.y += moveY * player.speed * dt;
+  player.x = clamp(player.x, player.size+6, canvas.width - player.size - 6);
+  player.y = clamp(player.y, player.size+6, canvas.height - player.size - 6);
+
+  // Auto-fire while aim stick active (or if move stick pushed up strongly)
+  player.shootCD -= dt;
+  const shouldShoot = aimActive || (moveActive && moveY < -0.65);
+  if(shouldShoot && player.shootCD <= 0){
+    // normalize aim vector
+    let ax = aimX, ay = aimY;
+    const m = Math.hypot(ax, ay) || 1;
+    ax /= m; ay /= m;
+    // spawn 1-2 bullets slightly offset
+    spawnPlayerBullet(player.x + ax*18, player.y + ay*18, ax, ay);
+    spawnParticles(player.x + ax*18, player.y + ay*18, 4, 'cyan');
+    player.shootCD = 0.16;
+  }
+
+  // update player bullets
+  for(let i=bullets.length-1;i>=0;i--){
+    const b = bullets[i];
+    b.x += b.dx * b.speed * dt;
+    b.y += b.dy * b.speed * dt;
+    b.life -= dt;
+    if(b.life <= 0 || b.x < -40 || b.x > canvas.width+40 || b.y < -40 || b.y > canvas.height+40){
+      bullets.splice(i,1);
+    }
+  }
+
+  // update enemy bullets (and hit player)
+  for(let i=enemyBullets.length-1;i>=0;i--){
+    const b = enemyBullets[i];
+    b.x += b.dx * b.speed * dt;
+    b.y += b.dy * b.speed * dt;
+    if(Math.hypot(b.x - player.x, b.y - player.y) < player.size + 6){
+      enemyBullets.splice(i,1);
+      spawnParticles(player.x, player.y, 10, 'white');
+      damagePlayer();
+      continue;
+    }
+    if(b.x < -60 || b.x > canvas.width+60 || b.y < -60 || b.y > canvas.height+60){
+      enemyBullets.splice(i,1);
+    }
+  }
+
+  // spawn enemies if no boss
+  if(!bossAlive){
+    enemyTimer -= dt;
+    if(spawnedEnemies < enemiesToSpawn && enemyTimer <= 0){
+      spawnEnemy();
+      enemyTimer = Math.max(0.45, 0.9 - wave*0.05);
+    }
+    if(spawnedEnemies >= enemiesToSpawn && enemies.length === 0){
+      // wave done
+      if(wave % 3 === 0){
+        spawnBoss();
+      } else {
+        wave++;
+        enemiesToSpawn = 8 + wave*2;
+        spawnedEnemies = 0;
+        document.getElementById('waveUI').innerText = 'Wave: ' + wave;
+      }
+    }
+  }
+
+  // update enemies
+  for(let ei = enemies.length-1; ei >= 0; ei--){
+    const e = enemies[ei];
+    if(e.boss){
+      // entrance
+      if(e.y < 120){
+        e.y += e.speed * dt;
+      } else {
+        // phases: hp% decides phase
+        const baseHp = 25 + (wave-1)*10;
+        const pct = e.hp / baseHp;
+        e.phase = pct > 0.66 ? 1 : pct > 0.33 ? 2 : 3;
+
+        // timers
+        e.attackTimer -= dt;
+        e.dashTimer -= dt;
+
+        // behavior per phase
+        if(e.phase === 1){
+          if(e.attackTimer <= 0){
+            e.attackTimer = 1.4;
+            // radial with slight randomness
+            const shots = 8;
+            for(let s=0;s<shots;s++){
+              const a = (s/shots)*Math.PI*2 + rand(-0.12,0.12);
+              spawnEnemyBullet(e.x, e.y+20, Math.cos(a), Math.sin(a), 220);
+            }
+          }
+        } else if(e.phase === 2){
+          if(e.attackTimer <= 0){
+            e.attackTimer = 2.5;
+            // radial + spawn minions
+            const shots = 12;
+            for(let s=0;s<shots;s++){
+              const a = (s/shots)*Math.PI*2;
+              spawnEnemyBullet(e.x, e.y+20, Math.cos(a), Math.sin(a), 260);
+            }
+            // spawn several minions
+            for(let m=0;m<3;m++){
+              enemies.push({
+                x: e.x + rand(-80,80),
+                y: e.y + 40,
+                size: 20,
+                speed: 140 + wave*6,
+                hp: 2,
+                canShoot: false
+              });
+            }
+          }
+        } else {
+          // phase 3: dash toward player then burst
+          if(e.dashTimer <= 0){
+            e.dashTimer = 3.2;
+            e.state = 'dash';
+            const dx = player.x - e.x;
+            const dy = player.y - e.y;
+            const mag = Math.hypot(dx,dy) || 1;
+            e.vx = (dx/mag) * 700;
+            e.vy = (dy/mag) * 700;
+            e.dashTime = 0.36;
+          }
+          if(e.state === 'dash'){
+            e.x += (e.vx||0) * dt;
+            e.y += (e.vy||0) * dt;
+            e.dashTime -= dt;
+            if(e.dashTime <= 0){
+              e.state = 'idle';
+              // aimed burst
+              for(let k=-2;k<=2;k++){
+                const dx = (player.x - e.x) + k*20;
+                const dy = (player.y - e.y);
+                const m = Math.hypot(dx,dy) || 1;
+                spawnEnemyBullet(e.x, e.y+20, dx/m, dy/m, 360);
+              }
+            }
+          }
+        }
+
+        // subtle horizontal bob
+        e.x += Math.sin((performance.now()/1000) + ei) * 14 * dt;
+        e.x = clamp(e.x, e.size+20, canvas.width - e.size - 20);
+      }
+    } else {
+      // basic enemy movement
+      e.y += e.speed * dt;
+      if(e.canShoot){
+        e.shootTimer -= dt;
+        if(e.shootTimer <= 0){
+          e.shootTimer = 1.6 + Math.random()*2.2;
+          const dx = player.x - e.x, dy = player.y - e.y;
+          const m = Math.hypot(dx,dy) || 1;
+          spawnEnemyBullet(e.x, e.y, dx/m, dy/m, 180);
+        }
+      }
+      // collision with player
+      if(Math.hypot(player.x - e.x, player.y - e.y) < player.size + e.size){
+        spawnParticles(player.x, player.y, 10, 'white');
+        damagePlayer();
+        enemies.splice(ei,1);
+        continue;
+      }
+    }
+
+    // remove off screen non-boss
+    if(!e.boss && e.y > canvas.height + 60){
+      enemies.splice(ei,1);
+    }
+  }
+
+  // bullets vs enemies
+  for(let bi = bullets.length-1; bi >= 0; bi--){
+    const b = bullets[bi];
+    for(let ei = enemies.length-1; ei >= 0; ei--){
+      const e = enemies[ei];
+      if(Math.hypot(b.x - e.x, b.y - e.y) < e.size){
+        // hit
+        e.hp = (e.hp||1) - 1;
+        bullets.splice(bi,1);
+        spawnParticles(b.x, b.y, 8, 'cyan');
+        if(e.hp <= 0){
+          // boss death
+          if(e.boss){
+            bossAlive = false;
+            score += 25;
+            wave++;
+            enemiesToSpawn = 8 + wave*2;
+            spawnedEnemies = 0;
+            // heal a bit
+            health = Math.min(5, health + 1);
+            document.getElementById('healthUI').innerText = 'Health: ' + health;
+            document.getElementById('waveUI').innerText = 'Wave: ' + wave;
+          } else {
+            score++;
+          }
+          enemies.splice(ei,1);
+          document.getElementById('scoreUI').innerText = 'Score: ' + score;
+        }
+        break;
+      }
+    }
+  }
+
+  // occasionally let enemies shoot (random)
+  // spawn a few shooters from existing enemies if wave high
+}
+
+/* ========= Draw ========= */
+function draw(){
+  // clear
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  // background subtle grid
+  ctx.save();
+  ctx.fillStyle = '#02101a';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.restore();
+
+  // draw player
+  ctx.save();
+  ctx.fillStyle = 'white';
+  ctx.beginPath(); ctx.arc(player.x, player.y, player.size, 0, Math.PI*2); ctx.fill();
+  ctx.restore();
+
+  // draw player bullets
+  ctx.fillStyle = 'cyan';
+  for(const b of bullets){
+    ctx.beginPath(); ctx.rect(b.x-6, b.y-6, 12, 12); ctx.fill();
+  }
+
+  // draw enemy bullets
+  ctx.fillStyle = 'orange';
+  for(const b of enemyBullets){
+    ctx.beginPath(); ctx.arc(b.x, b.y, 6, 0, Math.PI*2); ctx.fill();
+  }
+
+  // draw enemies
+  for(const e of enemies){
+    if(e.boss){
+      ctx.fillStyle = 'purple';
+      ctx.beginPath(); ctx.arc(e.x, e.y, e.size, 0, Math.PI*2); ctx.fill();
+      // boss HP bar
+      const maxHp = 25 + (wave-1)*10;
+      const barW = 180;
+      const hx = clamp(e.x - barW/2, 10, canvas.width - barW - 10);
+      const hy = e.y - e.size - 28;
+      ctx.fillStyle = '#000'; ctx.fillRect(hx-2, hy-6, barW+4, 14);
+      ctx.fillStyle = '#e33'; ctx.fillRect(hx, hy-4, barW * (e.hp / maxHp), 10);
+      ctx.strokeStyle = 'rgba(255,255,255,0.2)'; ctx.strokeRect(hx, hy-4, barW, 10);
+    } else {
+      ctx.fillStyle = '#ff4d4d';
+      ctx.beginPath(); ctx.arc(e.x, e.y, e.size, 0, Math.PI*2); ctx.fill();
+    }
+  }
+
+  // particles
+  for(const p of particles){
+    ctx.globalAlpha = Math.max(0, p.ttl / 0.9);
+    ctx.fillStyle = p.col || 'yellow';
+    ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+
+  // aim indicator
+  ctx.save();
+  ctx.fillStyle = 'rgba(255,255,255,0.12)';
+  ctx.beginPath(); ctx.arc(player.x + aimX*64, player.y + aimY*64, 8, 0, Math.PI*2); ctx.fill();
+  ctx.restore();
+}
+
+/* ========= Game start / button ========= */
+document.getElementById('startBtn').addEventListener('click', ()=>{
+  document.getElementById('menu').style.display = 'none';
+  running = true;
+  score = 0; wave = 1; enemiesToSpawn = 8; spawnedEnemies = 0; bossAlive = false; health = 3;
+  player.x = canvas.width/2; player.y = canvas.height - 160;
+  enemies = []; bullets = []; enemyBullets = []; particles = [];
+  document.getElementById('scoreUI').innerText = 'Score: 0';
+  document.getElementById('healthUI').innerText = 'Health: 3';
+  document.getElementById('waveUI').innerText = 'Wave: 1';
+});
+
+/* ========= small periodic enemy shooter upgrade (scaled with wave) ======== */
+setInterval(()=>{
+  // occasionally upgrade random enemy to shooter
+  if(!running) return;
+  if(Math.random() < 0.22 + wave*0.03){
+    const candidates = enemies.filter(e=>!e.boss && !e.canShoot);
+    if(candidates.length){
+      const e = candidates[Math.floor(Math.random()*candidates.length)];
+      e.canShoot = true;
+      e.shootTimer = rand(1.4,2.8);
+    }
+  }
+}, 1200);
+
+/* ========= main loop kickoff ========= */
+function frame(ts){
+  const dt = Math.min(0.05, (ts - last)/1000 || 0.016);
+  last = ts;
+  if(running) update(dt);
+  updateParticles(dt);
+  draw();
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+/* ======= debug helpers (optional) ======= */
+/* window.addEventListener('keydown', e=>{
+  if(e.key === 'b'){ spawnBoss(); }
+  if(e.key === 'n'){ spawnEnemy(); }
+}); */
+
+document.getElementById("homeBtn").addEventListener("click", () => {
+  window.location.href = "17th.html";
+});
+
+const gameMusic = document.getElementById("gameMusic");
+
+// Try to autoplay music when page loads
+window.addEventListener("load", () => {
+  const playPromise = gameMusic.play();
+  if (playPromise !== undefined) {
+    playPromise.catch(error => {
+      // Autoplay blocked; play on first user interaction
+      document.body.addEventListener("click", () => {
+        gameMusic.play();
+      }, { once: true });
+    });
+  }
+});
+
+</script>
+</body>
+</html>
