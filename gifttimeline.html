@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Our Gifts</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Quicksand', sans-serif;
+      background: linear-gradient(to bottom, #ffe3ec, #e6f5e6);
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .menu-icon {
+      font-size: 24px;
+      cursor: pointer;
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      z-index: 1100;
+      background: #d5eadf;
+      padding: 0.3rem 0.6rem;
+      border-radius: 8px;
+    }
+
+    .header {
+      padding: 3rem 1rem 2rem;
+      background-color: #d5eadf;
+      text-align: center;
+      position: relative;
+    }
+
+    .headline {
+      font-family: 'Dancing Script', cursive;
+      font-size: 2rem;
+      color: #3a7e62;
+      margin: 0.5rem 0 0.2rem;
+    }
+
+    .subheading {
+      font-size: 1.1rem;
+      color: #5a8c79;
+      margin: 0;
+    }
+
+    .side-menu {
+      position: fixed;
+      top: 0;
+      left: -250px;
+      width: 220px;
+      height: 100%;
+      background-color: #fce4ec;
+      padding-top: 4rem;
+      transition: 0.3s;
+      z-index: 1000;
+      overflow-y: auto;
+      border-right: 2px solid #ffd1dc;
+    }
+
+    .side-menu.show { left: 0; }
+
+    .main {
+      padding: 2rem 1rem 4rem;
+      flex: 1;
+    }
+
+    /* TIMELINE */
+
+    .timeline {
+      position: relative;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .timeline::after {
+      content: '';
+      position: absolute;
+      width: 4px;
+      background: #3a7e62;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      margin-left: -2px;
+    }
+
+    .timeline-item {
+      position: relative;
+      width: 50%;
+      padding: 2rem 2.5rem;
+    }
+
+    .timeline-item::after {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      background: #fff;
+      border: 4px solid #3a7e62;
+      top: 35px;
+      border-radius: 50%;
+      z-index: 1;
+    }
+
+    .left { left: 0; text-align: right; }
+    .left::after { right: -9px; }
+
+    .right { left: 50%; }
+    .right::after { left: -9px; }
+
+    .timeline-content {
+      background: #ffe3ec;
+      padding: 1.2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .timeline-content h3 {
+      margin: 0 0 0.4rem;
+      color: #3a7e62;
+    }
+
+    .timeline-content p {
+      margin: 0 0 0.6rem;
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    .timeline-content a {
+      display: inline-block;
+      padding: 0.6rem 1.2rem;
+      background: #3a7e62;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      transition: 0.2s ease;
+    }
+
+    .timeline-content a:hover { opacity: 0.85; }
+
+    @media (max-width: 768px) {
+      .timeline::after { left: 20px; }
+      .timeline-item {
+        width: 100%;
+        padding-left: 60px;
+        padding-right: 20px;
+      }
+      .timeline-item::after { left: 11px; }
+      .left, .right { left: 0; text-align: left; }
+    }
+
+    .footer {
+      text-align: center;
+      padding: 1rem;
+      background-color: #e0f7fa;
+      font-size: 0.9rem;
+      color: #555;
+      margin-top: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="menu-icon" onclick="toggleMenu()">☰</div>
+  <div id="menu-container"></div>
+
+  <header class="header">
+    <h1 class="headline">Gifts & Stuff</h1>
+    <p class="subheading">We made for each other</p>
+  </header>
+
+  <main class="main">
+    <div class="timeline">
+
+      
+
+      <div class="timeline-item right">
+        <div class="timeline-content">
+          <h3>6th Monthversary</h3>
+          <p>28/12/2024</p>
+          <a href="https://drive.google.com/drive/folders/1mWbP-Quz_xtd9Z8nVyRXkp43a5dJg92f" target="_blank" rel="noopener noreferrer">Open Gift</a>
+        </div>
+      </div>
+
+      <div class="timeline-item left">
+        <div class="timeline-content">
+          <h3>7th Monthversary</h3>
+          <p>28/1/2025</p>
+          <a href="https://drive.google.com/drive/folders/1mVLjCahXJoz1TQtT5LDOm7M2Q2TVn7SJ" target="_blank" rel="noopener noreferrer">Open Gift</a>
+        </div>
+      </div>
+
+      <div class="timeline-item right">
+        <div class="timeline-content">
+          <h3>Valentine's Day 2025</h3>
+          <p>14/2/2025</p>
+          <a href="https://drive.google.com/drive/folders/1n9DIAcVe1NMWxvN1HhGyklxIed7gbE29" target="_blank" rel="noopener noreferrer">Open Gift</a>
+        </div>
+      </div>
+
+      <div class="timeline-item left">
+        <div class="timeline-content">
+          <h3>8th Monthversary</h3>
+          <p>28/2/2025</p>
+          <a href="https://drive.google.com/drive/folders/1mGhHIhPOXu7hh9mBd771ZQckPbARVcie" target="_blank" rel="noopener noreferrer">Open Gift</a>
+        </div>
+      </div>
+
+      <div class="timeline-item right">
+        <div class="timeline-content">
+          <h3>9th Monthversary</h3>
+          <p>28/3/2025</p>
+          <a href="https://drive.google.com/drive/folders/1mFVLoIPQFBau74xjc-YFSaDVExDlUPDP" target="_blank" rel="noopener noreferrer">Open Gift</a>
+        </div>
+      </div>
+      
+      <div class="timeline-item left">
+        <div class="timeline-content">
+          <h3>10th Monthversary</h3>
+          <p>28/4/2025</p>
+          <a href="10th.html" target="_blank" rel="noopener noreferrer">Open Gift</a>
+        </div>
+      </div>
+
+      <div class="timeline-item left">
+        <div class="timeline-content">
+          <h3>Happy Birthday Ally</h3>
+          <p>19/5/2025</p>
+          <a href="https://drive.google.com/drive/folders/1lAD-_vwVWlBLD215ZB6lonjP12WWcMUj" target="_blank" rel="noopener noreferrer">Open Gift</a>
+        </div>
+      </div>
+      
+      <div class="timeline-item right">
+        <div class="timeline-content">
+          <h3>11th Monthversary</h3>
+          <p>28/5/2025</p>
+          <a href="11th.html" target="_blank" rel="noopener noreferrer">Open Gift</a>
+        </div>
+      </div>
+      
+      <div class="timeline-item right">
+        <div class="timeline-content">
+          <h3>11th Monthversary (Folder)</h3>
+          <p>28/5/2025</p>
+          <a href="https://drive.google.com/drive/folders/1NOwISmuPe5B6cnJxiPzenbv_sI1X6ExS" target="_blank" rel="noopener noreferrer">Open Gift</a>
+        </div>
+      </div>
+      
+      <div class="timeline-item right">
+        <div class="timeline-content">
+          <h3>1 Year Anniversary/12th Monthversary</h3>
+          <p>28/6/2025</p>
+          <a href="1A-12th.html" target="_blank" rel="noopener noreferrer">Open Gift</a>
+        </div>
+      </div>
+      
+      
+      <div class="timeline-item left">
+        <div class="timeline-content">
+          <h3>13th Monthversary</h3>
+          <p>28/7/2025</p>
+          <a href="https://drive.google.com/drive/folders/1kL4pYNWOG4Ymy_UoCv-FQ2l9u7pf2mDN" target="_blank" rel="noopener noreferrer">Open Gift</a>
+        </div>
+      </div>
+      
+      <div class="timeline-item left">
+        <div class="timeline-content">
+          <h3>Flipbook</h3>
+          <p>3/8/2025</p>
+          <a href="flipbook.html" target="_blank" rel="noopener noreferrer">Open Gift</a>
+        </div>
+      </div>
+      
+      <div class="timeline-item left">
+        <div class="timeline-content">
+          <h3>Allys first gift lowkey</h3>
+          <p>3/8/2025</p>
+          <a href="allywebnayan.html" target="_blank" rel="noopener noreferrer">Open Gift</a>
+        </div>
+      </div>
+      
+
+      <div class="timeline-item right">
+        <div class="timeline-content">
+          <h3>14th Monthversary</h3>
+          <p>28/8/2025</p>
+          <a href="https://drive.google.com/drive/folders/1zmhak-Z1QbSrWu9DlVTJNjFl5Pi9iP2i" target="_blank" rel="noopener noreferrer">Open Gift</a>
+        </div>
+      </div>
+
+      <div class="timeline-item left">
+        <div class="timeline-content">
+          <h3>15th Monthversary</h3>
+          <p>28/9/2025</p>
+          <a href="game15month.html" target="_blank" rel="noopener noreferrer">Open Gift</a>
+        </div>
+      </div>
+
+      <div class="timeline-item right">
+        <div class="timeline-content">
+          <h3>16th Monthversary</h3>
+          <p>28/10/2025</p>
+          <a href="https://drive.google.com/file/d/1jQDl3M6FcfKcrWLl8v0cKsaUrh4GWDVP/view?usp=drivesdk" target="_blank" rel="noopener noreferrer">Open Gift</a>
+        </div>
+      </div>
+
+<div class="timeline-item right">
+        <div class="timeline-content">
+          <h3>17th Monthversary</h3>
+          <p>28/11/2025</p>
+          <a href="17th.html" target="_blank" rel="noopener noreferrer">Open Gift</a>
+        </div>
+      </div>
+      
+      <div class="timeline-item right">
+        <div class="timeline-content">
+          <h3>18th Monthversary</h3>
+          <p>28/12/2025</p>
+          <a href="18th.html" target="_blank" rel="noopener noreferrer">Open Gift</a>
+        </div>
+      </div>
+      
+      <div class="timeline-item right">
+        <div class="timeline-content">
+          <h3>18th Monthversary (Folder)</h3>
+          <p>28/12/2025</p>
+          <a href="https://drive.google.com/drive/folders/1LhZXzq6DJwyMR783cr0mevxX-_LlTq6A" target="_blank" rel="noopener noreferrer">Open Gift</a>
+        </div>
+      </div>
+      
+      <div class="timeline-item right">
+        <div class="timeline-content">
+          <h3>Nayan's 22th Bday</h3>
+          <p>18/1/2026</p>
+          <a href="nayan22bday.html" target="_blank" rel="noopener noreferrer">Open Gift</a>
+        </div>
+      </div>
+      
+      <div class="timeline-item right">
+        <div class="timeline-content">
+          <h3>19th Monthversary</h3>
+          <p>28/1/2026</p>
+          <a href="19th.html" target="_blank" rel="noopener noreferrer">Open Gift</a>
+        </div>
+      </div>
+      
+      
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>I love you Ally, Forever & Always 💌</p>
+  </footer>
+
+  <script>
+    function toggleMenu() {
+      const menu = document.getElementById("sideMenu");
+      if (menu) menu.classList.toggle("show");
+    }
+
+    fetch("menu.html")
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById("menu-container").innerHTML = data;
+      });
+  </script>
+
+</body>
+</html>

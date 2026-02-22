@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Games</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Quicksand', sans-serif;
+      background: linear-gradient(to bottom, #ffe3ec, #e6f5e6);
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .menu-icon {
+      font-size: 24px;
+      cursor: pointer;
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      z-index: 1100;
+      background: #d5eadf;
+      padding: 0.3rem 0.6rem;
+      border-radius: 8px;
+    }
+
+    .header {
+      padding: 3rem 1rem 2rem;
+      background-color: #d5eadf;
+      text-align: center;
+      position: relative;
+    }
+
+    .headline {
+      font-family: 'Dancing Script', cursive;
+      font-size: 2rem;
+      color: #3a7e62;
+      margin: 0.5rem 0 0.2rem;
+    }
+
+    .subheading {
+      font-size: 1.1rem;
+      color: #5a8c79;
+      margin: 0;
+    }
+
+    .side-menu {
+      position: fixed;
+      top: 0;
+      left: -250px;
+      width: 220px;
+      height: 100%;
+      background-color: #fce4ec;
+      padding-top: 4rem;
+      transition: 0.3s;
+      z-index: 1000;
+      overflow-y: auto;
+      border-right: 2px solid #ffd1dc;
+    }
+
+    .side-menu.show {
+      left: 0;
+    }
+
+    .side-menu ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .side-menu li {
+      padding: 10px 20px;
+    }
+
+    .side-menu a {
+      text-decoration: none;
+      color: #3a7e62;
+      font-weight: bold;
+      display: block;
+    }
+
+    .submenu {
+      display: none;
+      padding-left: 15px;
+    }
+
+    .has-submenu > a::after {
+      content: " \25BC";
+      font-size: 0.8rem;
+    }
+
+    .has-submenu.open .submenu {
+      display: block;
+    }
+
+    .arrow-down {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #3a7e62;
+      transition: transform 0.3s ease;
+    }
+
+    .has-submenu.open .arrow-down {
+      transform: rotate(180deg);
+    }
+
+    .main {
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .gift-button {
+      background-color: #ffe3ec;
+      border: 2px solid #f8bbd0;
+      padding: 1rem 2rem;
+      border-radius: 12px;
+      font-family: 'Quicksand', sans-serif;
+      font-size: 1.2rem;
+      color: #3a7e62;
+      text-decoration: none;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      transition: all 0.2s ease-in-out;
+      width: 80%;
+      max-width: 300px;
+    }
+
+    .gift-button:hover {
+      background-color: #fce4ec;
+      transform: scale(1.05);
+    }
+
+    .footer {
+      text-align: center;
+      padding: 1rem;
+      background-color: #e0f7fa;
+      font-size: 0.9rem;
+      color: #555;
+      margin-top: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="menu-icon" onclick="toggleMenu()">☰</div>
+  <div id="menu-container"></div>
+
+  <header class="header">
+    <h1 class="headline">Stupid Games</h1>
+    <p class="subheading">Retarded games I made</p>
+  </header>
+
+  <main class="main">
+  <h2 style="color: #3a7e62;">Have fun</h2>
+  <div style="display: flex; flex-direction: column; gap: 1.2rem; align-items: center; margin-top: 2rem;">
+    
+    
+
+    <div style="display: flex; justify-content: space-between; align-items: center; width: 90%; max-width: 500px;">
+      <span style="font-size: 1.2rem; color: #3a7e62;">Catch the Hearts V1</span>
+      <a href="heartgame.html" style="font-size: 1.5rem; text-decoration: none;">▶️</a>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; width: 90%; max-width: 500px;">
+      <span style="font-size: 1.2rem; color: #3a7e62;">15th Monthversary Game</span>
+      <a href="game15thmonth.html" style="font-size: 1.5rem; text-decoration: none;">▶️</a>
+    </div>
+
+<div style="display: flex; justify-content: space-between; align-items: center; width: 90%; max-width: 500px;">
+      <span style="font-size: 1.2rem; color: #3a7e62;">Cat Simulator</span>
+      <a href="petgame.html" style="font-size: 1.5rem; text-decoration: none;">▶️</a>
+    </div>
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; width: 90%; max-width: 500px;">
+      <span style="font-size: 1.2rem; color: #3a7e62;">18th monthversary game</span>
+      <a href="18th.html" style="font-size: 1.5rem; text-decoration: none;">▶️</a>
+    </div>
+    
+    
+
+  </div>
+</main>
+
+  <footer class="footer">
+    <p>I love you Ally, Forever & Always 💌</p>
+  </footer>
+
+  <script>
+    function toggleMenu() {
+      document.getElementById("sideMenu").classList.toggle("show");
+    }
+    function toggleSubmenu(event, el) {
+      event.preventDefault();
+      el.parentElement.classList.toggle("open");
+    }
+
+    // Load shared menu
+    fetch("menu.html")
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById("menu-container").innerHTML = data;
+      });
+  </script>
+</body>
+</html>
