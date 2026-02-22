@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ForNayanNigga</title>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom right, #581845, #c9184a, #ff758f);
+      overflow-y: auto;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      position: relative;
+      color: #fff0f5;
+      padding-bottom: 150px;
+    }
+
+    #introText {
+      font-size: 32px;
+      padding: 14px 24px;
+      border-radius: 30px;
+      background: rgba(255, 182, 193, 0.2);
+      box-shadow: 0 0 15px #ffb6c1;
+      margin-top: 40px;
+      z-index: 2;
+      font-family: 'Great Vibes', 'Brush Script MT', cursive;
+      text-shadow: 0 0 8px #fff0f5;
+      text-align: center;
+    }
+
+    #heartButton {
+      font-size: 24px;
+      font-weight: bold;
+      color: #c9184a;
+      padding: 16px;
+      border: none;
+      cursor: pointer;
+      background: linear-gradient(to right, #ffe6e6, #fff0f5);
+      border-radius: 50%;
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      box-shadow: 0 0 20px #ffd1dc, 0 0 25px #ffc0cb, 0 0 35px #fff0f5;
+      animation: pulse 1.8s infinite;
+      z-index: 3;
+    }
+
+    #heartButton::before,
+    #heartButton::after {
+      content: "🪽";
+      font-size: 24px;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    #heartButton::before {
+      left: -28px;
+      transform: translateY(-50%) scaleX(-1) rotate(20deg);
+    }
+
+    #heartButton::after {
+      right: -28px;
+      transform: translateY(-50%) rotate(20deg);
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.1);
+      }
+    }
+
+    .glitter {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: white;
+      border-radius: 50%;
+      box-shadow: 0 0 6px white;
+      animation: glitter 6s linear infinite, twinkle 2s ease-in-out infinite alternate;
+      opacity: 0.8;
+    }
+
+    @keyframes glitter {
+      0% {
+        transform: translateY(100vh) scale(0.6);
+        opacity: 0;
+      }
+      50% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-20vh) scale(1.2);
+        opacity: 0;
+      }
+    }
+
+    @keyframes twinkle {
+      0% { transform: scale(1); opacity: 0.5; }
+      50% { transform: scale(1.4); opacity: 1; }
+      100% { transform: scale(1); opacity: 0.6; }
+    }
+
+    .butterfly {
+      position: absolute;
+      font-size: 20px;
+      animation: float 10s infinite ease-in-out;
+      opacity: 0.6;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+      }
+      50% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    @keyframes popup {
+      0% {
+        transform: scale(0.5);
+        opacity: 0;
+      }
+      60% {
+        transform: scale(1.1);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    #message {
+      font-size: 22px;
+      color: #fff0f5;
+      background: rgba(255, 192, 203, 0.3);
+      padding: 30px;
+      border-radius: 30px;
+      box-shadow: 0 0 25px #ffc0cb;
+      margin-top: 30px;
+      max-width: 90%;
+      max-height: 400px;
+      overflow-y: auto;
+      text-align: center;
+      font-family: 'Great Vibes', 'Brush Script MT', cursive;
+      opacity: 0;
+      transform: scale(0.5);
+    }
+
+    #message.pop {
+      animation: popup 1s ease forwards;
+    }
+  </style>
+</head>
+<body>
+  <div id="introText">⋆. 𐙚˚࿔ To my Nayanigga 𝜗𝜚˚⋆</div>
+
+  <button id="heartButton">💗</button>
+
+  <div id="message">
+    <span>
+      Hello, nigga. I know, for the first time, finally, Ally did something special for you. I'm deeply sorry for what I did to you. I'm sorry for everything. I know this simple gift is not enough, but I hope you like it. I tried learning this shit. And you are right, coding isn't just relying on ChatGPT or any artificial intelligence. It includes our efforts, time, and hard work.<br><br>
+
+      I'm so proud of you, Nayan, for doing your best those times when you weren't tired of me yet. I know you are still doing your best somehow, but you want to take a rest from the stress that I caused too. Thank you for doing things that make me so happy. Thank you for loving me. Thank you for staying, even though you don't have any reason to stay anymore. I broke your trust. I hurt you multiple times. I broke and abused you. Yet? You are here. Loving me. Trying to fight for our relationship.<br><br>
+
+      I don't know myself too, for real. Am I crazy? Mentally ill? I don't know. Maybe it's just a lot of shit that happened last month.<br><br>
+
+      I hope we become okay.
+    </span>
+  </div>
+
+  <script>
+    const button = document.getElementById("heartButton");
+    const message = document.getElementById("message");
+
+    // Play background music
+    const bgMusic = new Audio("https://docs.google.com/uc?export=download&id=1RIZLRU0Mu2-81NBYMLhZY1QBHS8OWq_g");
+    bgMusic.loop = true;
+    bgMusic.volume = 0.2;
+
+    button.addEventListener("click", () => {
+      message.classList.add("pop");
+      bgMusic.play();
+    });
+
+    // Glitter and floating hearts
+    for (let i = 0; i < 30; i++) {
+      const glitter = document.createElement("div");
+      glitter.classList.add("glitter");
+      glitter.style.left = Math.random() * 100 + "vw";
+      glitter.style.top = Math.random() * 100 + "vh";
+      document.body.appendChild(glitter);
+    }
+
+    const butterflies = ['💕', '🫀'];
+    for (let i = 0; i < 10; i++) {
+      const butterfly = document.createElement("div");
+      butterfly.classList.add("butterfly");
+      butterfly.textContent = butterflies[Math.floor(Math.random() * butterflies.length)];
+      butterfly.style.left = Math.random() * 100 + "vw";
+      butterfly.style.top = Math.random() * 100 + "vh";
+      butterfly.style.animationDelay = Math.random() * 5 + "s";
+      document.body.appendChild(butterfly);
+    }
+  </script>
+</body>
+</html>
