@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Bonat OS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root{
+  --matcha:#9fce8a;
+  --matcha-dark:#7ead6d;
+  --pink:#ff9fc8;
+  --soft:#f5f1f7;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:"Poppins",sans-serif;-webkit-tap-highlight-color:transparent;}
+body{background:#dcdcdc;display:flex;justify-content:center;align-items:center;height:100vh;overflow:hidden;}
+.phone{width:380px;height:780px;background:#fff;border-radius:32px;box-shadow:0 20px 40px rgba(0,0,0,0.2);position:relative;overflow:hidden;}
+.wallpaper{
+  position:absolute;
+  inset:0;
+  background: url('17home.jpg') center/cover no-repeat;
+  z-index:0;
+}
+.statusbar{position:absolute;top:0;width:100%;height:46px;display:flex;justify-content:space-between;align-items:center;padding:0 14px;color:#2c2c2c;font-size:15px;z-index:999!important;}
+.status-right span{margin-left:6px;}
+.notif-shade{position:absolute;left:0;right:0;top:0;height:58%;background:#ffffffee;backdrop-filter: blur(10px);border-bottom-left-radius:26px;border-bottom-right-radius:26px;box-shadow:0 18px 40px rgba(0,0,0,0.15);transform: translateY(-100%);transition: transform 260ms cubic-bezier(.2,.9,.3,1);z-index:19;pointer-events:none;padding:18px;}
+.notif-shade.open{transform: translateY(0);pointer-events:auto;}
+.shade-handle{width:55px;height:6px;background:#cfcfcf;border-radius:10px;margin:auto;}
+.notif-title{margin-top:16px;font-weight:600;color:#444;width:100%;display:flex;justify-content:center;text-align:center;}
+.music-controls{margin-top:20px;display:flex;align-items:center;gap:12px;background:#f2f7ea;border-radius:14px;padding:14px;width:100%;box-shadow:0 4px 10px rgba(0,0,0,0.05);}
+#trackTitle{font-size:14px;color:#3f3f3f;}
+.music-btn{width:50px;height:50px;background:var(--matcha);border-radius:14px;display:flex;justify-content:center;align-items:center;font-size:22px;color:white;cursor:pointer;user-select:none;}
+.progress-wrap{height:7px;background:#d3e9cd;border-radius:10px;margin-top:5px;overflow:hidden;}
+#progressBar{height:100%;width:0%;background:linear-gradient(90deg, var(--matcha-dark), var(--pink));transition:width .1s linear;}
+.home{position:absolute;top:56px;left:0;right:0;bottom:70px;padding:22px;display:flex;flex-direction:column;gap:24px;z-index:1;}
+.apps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+.app{text-align:center;cursor:pointer;}
+.icon-wrap{width:70px;height:70px;border-radius:18px;background:#ffffffcc;backdrop-filter:blur(4px);display:flex;justify-content:center;align-items:center;box-shadow:0 6px 16px rgba(0,0,0,0.1);margin:auto;font-size:34px;}
+.app-label{margin-top:8px;font-size:14px;color:#000000;text-shadow:
+    -1px -1px 0 white,
+     1px -1px 0 white,
+    -1px  1px 0 white,
+     1px  1px 0 white;}
+.dock{position:absolute;bottom:0;left:0;width:100%;height:70px;display:flex;justify-content:center;gap:40px;align-items:center;background:#ffffffdd;backdrop-filter:blur(6px);z-index:20;}
+.nav-btn{width:60px;height:60px;background:#ffffff;border-radius:20px;display:flex;justify-content:center;align-items:center;font-size:26px;box-shadow:0 6px 16px rgba(0,0,0,0.1);cursor:pointer;}
+.lockscreen{position:absolute;inset:0;background: url('17lock.jpg') center/cover no-repeat, linear-gradient(180deg,#333,#111);z-index:30;display:flex;flex-direction:column;justify-content:center;align-items:center;color:#fff;font-size:64px;font-weight:500;touch-action:none;border-radius:32px;overflow:hidden;transition: transform 0.3s cubic-bezier(.25,.8,.25,1), opacity 0.3s ease;}
+.lockscreen.unlocking{transition:none;}
+.lockscreen-time{font-size:64px;margin-bottom:12px;}
+.lockscreen-date{font-size:20px;opacity:0.8;}
+.swipe-arrow{font-size:24px;margin-top:20px;opacity:0.7;animation:bounce 1.2s infinite;}
+@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+#powerScreen{position:absolute;inset:0;background:#111;z-index:100;display:flex;flex-direction:column;justify-content:center;align-items:center;color:#fff;font-family:"Poppins",sans-serif;text-align:center;border-radius:32px;transition:opacity 0.6s ease;}
+#powerBtn{width:60px;height:60px;border-radius:50%;background:#444;display:flex;justify-content:center;align-items:center;font-size:28px;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.4);transition:background 0.2s;}
+#powerBtn:hover{background:#666;}
+#bootText{margin-top:20px;font-size:16px;opacity:0;transition:opacity 0.4s;}
+.loader{margin-top:12px;border:4px solid #333;border-top:4px solid #fff;border-radius:50%;width:28px;height:28px;animation:spin 1s linear infinite;opacity:0;transition:opacity 0.4s;}
+@keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+
+.message-notif {
+  margin-top: 16px;
+  background: #e7eee2;
+  padding: 12px 14px;
+  border-radius: 12px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+  font-size: 14px;
+  color: #333;
+}
+
+.message-sender {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.message-text {
+  opacity: 0.85;
+}
+</style>
+</head>
+<body>
+
+<div class="phone" id="phone">
+
+  <!-- POWER SCREEN -->
+  <div id="powerScreen">
+    <div id="powerBtn">🔘</div>
+    <div id="bootText">Turning on Bonat OS</div>
+    <div class="loader"></div>
+  </div>
+
+  <!-- LOCKSCREEN -->
+  <div class="lockscreen" id="lockscreen">
+    <div class="lockscreen-time" id="lockTime">12:00</div>
+    <div class="lockscreen-date" id="lockDate">Wed, Nov 27</div>
+    <div style="margin-top:60px; font-size:26px; opacity:0.7; text-shadow:0 0 2px #000;">Swipe up to unlock!!!</div>
+    <div class="swipe-arrow">🔺</div>
+  </div>
+
+  <div class="wallpaper"></div>
+
+  <!-- NOTIFICATION SHADE -->
+  <div class="notif-shade" id="notifShade">
+    <div class="shade-handle"></div>
+    <div class="notif-title">Notifications</div>
+    <div class="music-controls">
+      <div style="flex:1">
+        <div id="trackTitle">Homescreen Ambience</div>
+        <div class="progress-wrap"><div id="progressBar"></div></div>
+      </div>
+      <div id="playPauseBtn" class="music-btn">▶️</div>
+    </div>
+    <!-- Inside .notif-shade, under .music-controls -->
+<div class="message-notif">
+  <div class="message-sender">Nayan Husbanto</div>
+  <div class="message-text">Happy 17th Monthversary Allygatur!!!!</div>
+</div>
+  </div>
+
+  <!-- BACKGROUND MUSIC -->
+  <audio id="bgMusic" src="17music1.mp3" loop preload="auto"></audio>
+
+  <!-- STATUS BAR -->
+  <div class="statusbar">
+    <div class="status-left"><span id="statusTime">12:00</span></div>
+    <div class="status-right">
+      <span>A❤️N</span>
+      <span>🛜</span>
+    </div>
+  </div>
+
+  <!-- HOME -->
+  <div class="home">
+    <div class="apps-grid">
+      <div class="app" onclick="window.location='notesapp.html'">
+        <div class="icon-wrap">📒</div>
+        <div class="app-label">Notes</div>
+      </div>
+      <div class="app" onclick="window.location='galleryapp.html'">
+        <div class="icon-wrap">🖼️</div>
+        <div class="app-label">Gallery</div>
+      </div>
+      <div class="app" onclick="window.location='doodleapp.html'">
+        <div class="icon-wrap">🎨</div>
+        <div class="app-label">Doodle</div>
+      </div>
+      <div class="app" onclick="window.location='petgame.html'">
+        <div class="icon-wrap">😸</div>
+        <div class="app-label">Car simulator</div>
+      </div>
+      <div class="app" onclick="window.location='shootgame.html'">
+        <div class="icon-wrap">☢️</div>
+        <div class="app-label">Kell World</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DOCK -->
+  <div class="dock">
+    <div class="nav-btn" onclick="history.back()">⬅</div>
+    <div class="nav-btn" onclick="window.location='17th.html'">🏠</div>
+  </div>
+
+</div>
+
+<script>
+/* ------------------- FULL MUSIC + BOOT + LOCKSCREEN ------------------- */
+const powerScreen = document.getElementById("powerScreen");
+const powerBtn = document.getElementById("powerBtn");
+const bootText = document.getElementById("bootText");
+const loader = document.querySelector("#powerScreen .loader");
+const lockscreen = document.getElementById("lockscreen");
+const notif = document.getElementById("notifShade");
+const phone = document.getElementById("phone");
+const playPauseBtn = document.getElementById("playPauseBtn");
+const progressBar = document.getElementById("progressBar");
+const progressWrap = document.querySelector(".progress-wrap");
+const bgMusic = document.getElementById("bgMusic");
+if(bgMusic) bgMusic.loop=true;
+
+const TIMEOUT_MS = 15*60*1000; // 15 minutes
+let musicUnlocked=false;
+
+// try to play music immediately from user gesture
+function tryPlayMusicImmediate(){
+  if(!bgMusic) return Promise.reject();
+  return bgMusic.play().then(()=>{musicUnlocked=true}).catch(()=>Promise.reject());
+}
+// safe retry (non-gesture)
+function tryPlayMusicRetry(){if(!bgMusic || musicUnlocked) return; bgMusic.play().then(()=>{musicUnlocked=true}).catch(()=>{});}
+
+// ================== BOOT + LOCKSCREEN CONTROL ==================
+function shouldShowBoot(){
+  const lastBoot = parseInt(localStorage.getItem("lastBootTime"))||0;
+  return Date.now()-lastBoot>TIMEOUT_MS;
+}
+
+// hide by default if boot not needed
+let showBoot = shouldShowBoot();
+if(!showBoot){
+  powerScreen.style.display="none";
+  lockscreen.style.display="none";
+}else{
+  localStorage.setItem("lastBootTime", Date.now());
+}
+
+if(powerBtn){
+  powerBtn.addEventListener("click", ()=>{
+    if(powerScreen.dataset.booting==="1") return;
+    powerScreen.dataset.booting="1";
+    tryPlayMusicImmediate().catch(()=>{});
+    if(bootText) bootText.style.opacity="1";
+    if(loader) loader.style.opacity="1";
+    powerBtn.style.opacity="0";
+    setTimeout(()=>{
+      powerScreen.style.opacity="0";
+      setTimeout(()=>{
+        powerScreen.style.display="none";
+        powerScreen.dataset.booting="0";
+        tryPlayMusicRetry();
+      },600);
+    },5000);
+  });
+}
+
+// show boot again if 15 mins passed and page comes back to visible
+document.addEventListener("visibilitychange", ()=>{
+  if(document.visibilityState==="visible" && shouldShowBoot()){
+    powerScreen.style.display="flex";
+    powerScreen.style.opacity="1";
+    lockscreen.style.display="flex";
+    localStorage.setItem("lastBootTime", Date.now());
+  }
+});
+
+// ================== MUSIC PLAY/PAUSE + PROGRESS ==================
+if(playPauseBtn){
+  playPauseBtn.addEventListener("click", ()=>{
+    if(!bgMusic) return;
+    if(bgMusic.paused) bgMusic.play().then(()=>{musicUnlocked=true; playPauseBtn.textContent="⏸️";}).catch(()=>{});
+    else{bgMusic.pause(); playPauseBtn.textContent="▶️";}
+  });
+}
+if(bgMusic && progressBar){
+  bgMusic.addEventListener("timeupdate", ()=>{
+    if(!bgMusic.duration) return;
+    progressBar.style.width=(bgMusic.currentTime/bgMusic.duration*100)+"%";
+    if(playPauseBtn) playPauseBtn.textContent=bgMusic.paused?"▶️":"⏸️";
+  });
+}
+if(progressWrap){
+  progressWrap.addEventListener("click",(e)=>{
+    if(!bgMusic||!bgMusic.duration) return;
+    const r=progressWrap.getBoundingClientRect();
+    const x=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width));
+    bgMusic.currentTime=x*bgMusic.duration;
+  });
+}
+
+// ================== NOTIFICATION SHADE SWIPE ==================
+let startY=0;
+if(phone){
+  phone.addEventListener("touchstart", e=>{startY=e.touches[0].clientY;},{passive:true});
+  phone.addEventListener("touchmove", e=>{
+    if(!e.touches) return;
+    const delta=e.touches[0].clientY-startY;
+    if(delta>40 && notif) notif.classList.add("open");
+    if(delta<-40 && notif) notif.classList.remove("open");
+  },{passive:true});
+}
+
+// ================== LOCKSCREEN SWIPE & DOUBLE TAP ==================
+
+// top-level lock variables so both swipe and double-tap can access
+let lockStartY = 0;
+let lockCurrentY = 0;
+let unlocked = false;
+
+if(lockscreen){
+  // swipe to unlock
+  lockscreen.addEventListener("touchstart", (e) => {
+    if (unlocked) return;
+    lockStartY = e.touches[0].clientY;
+    lockscreen.classList.add("unlocking");
+  });
+
+  lockscreen.addEventListener("touchmove", (e) => {
+    if (unlocked) return;
+    lockCurrentY = e.touches[0].clientY;
+    let delta = lockStartY - lockCurrentY;
+    if (delta < 0) delta = 0;
+    let pct = Math.min(delta / 150, 1);
+    lockscreen.style.transform = `translateY(-${pct * 100}%)`;
+    lockscreen.style.opacity = `${1 - pct * 0.8}`;
+  }, { passive: true });
+
+  lockscreen.addEventListener("touchend", (e) => {
+    if (unlocked) return;
+    let delta = lockStartY - lockCurrentY;
+    if (delta > 80) {
+      lockscreen.style.transform = `translateY(-100%)`;
+      lockscreen.style.opacity = 0;
+      unlocked = true;
+      setTimeout(() => lockscreen.style.display = "none", 300);
+      tryPlayMusicRetry();
+    } else {
+      lockscreen.style.transform = `translateY(0)`;
+      lockscreen.style.opacity = 1;
+      lockscreen.classList.remove("unlocking");
+    }
+  });
+}
+
+// double-tap to show lockscreen
+let lastTap = 0;
+const DOUBLE_TAP_DELAY = 300; // ms
+
+const homeScreen = document.querySelector(".home");
+if (homeScreen){
+  homeScreen.addEventListener("touchend", (e) => {
+    const currentTime = Date.now();
+    const tapLength = currentTime - lastTap;
+
+    if (tapLength < DOUBLE_TAP_DELAY && tapLength > 0){
+      // reset lockscreen state
+      unlocked = false;
+      lockStartY = 0;
+      lockCurrentY = 0;
+      lockscreen.style.display = "flex";
+      lockscreen.style.opacity = "1";
+      lockscreen.style.transform = "translateY(0)";
+      lockscreen.classList.remove("unlocking");
+    }
+
+    lastTap = currentTime;
+  });
+}
+
+// ================== FALLBACK INTERACTIONS ==================
+["click","touchstart","keydown"].forEach(evt=>{
+  document.addEventListener(evt, ()=>{tryPlayMusicRetry();},{once:false});
+});
+window.addEventListener("load", ()=>{tryPlayMusicRetry();});
+
+// ================== TIME UPDATE ==================
+function updateTime(){
+  const t=new Date(); let h=t.getHours(), m=t.getMinutes(); if(m<10)m="0"+m;
+  document.getElementById("statusTime").textContent=h+":"+m;
+}
+setInterval(updateTime,1000);
+updateTime();
+
+function updateLockscreenTime(){
+  const t=new Date(); let h=t.getHours(), m=t.getMinutes(); if(m<10)m="0"+m;
+  document.getElementById("lockTime").textContent=h+":"+m;
+  const options={weekday:'short',month:'short',day:'numeric'};
+  document.getElementById("lockDate").textContent=t.toLocaleDateString('en-US',options);
+}
+setInterval(updateLockscreenTime,1000);
+updateLockscreenTime();
+</script>
+
+</body>
+</html>
