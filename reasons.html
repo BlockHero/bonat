@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>11 Reasons I Love You</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lobster&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Quicksand', sans-serif;
+      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    header {
+      font-family: 'Lobster', cursive;
+      font-size: 2.2em;
+      margin-bottom: 10px;
+      color: black;
+    }
+
+    .subheader {
+      font-family: 'Quicksand', sans-serif;
+      font-size: 1.1em;
+      font-weight: 500;
+      margin-bottom: 30px;
+      color: #333;
+    }
+
+    .reason-box {
+      background: linear-gradient(145deg, #fff, #fdf3f4);
+      padding: 30px 25px;
+      border-radius: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      border: 2px solid #ffe1e5;
+      max-width: 600px;
+      margin: 0 20px;
+      font-size: 1.2em;
+      line-height: 1.6;
+      min-height: 150px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Animation */
+    @keyframes fadeWiggle {
+      0% { opacity: 0; transform: scale(0.98) rotate(-1deg); }
+      50% { opacity: 1; transform: scale(1.02) rotate(1deg); }
+      100% { transform: scale(1) rotate(0); }
+    }
+
+    .reason-box.animate {
+      animation: fadeWiggle 0.6s ease-in-out;
+    }
+
+    .buttons {
+      margin-top: 30px;
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    button, .back-home {
+      padding: 10px 20px;
+      font-size: 1em;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transition: background 0.3s, transform 0.2s;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    button {
+      background-color: #ff6f91;
+      color: white;
+    }
+
+    button:hover {
+      background-color: #ff5078;
+      transform: scale(1.05);
+    }
+
+    .back-home {
+      background-color: #cce3c1;
+      color: #2e5e2d;
+    }
+
+    .back-home:hover {
+      background-color: #b7d5aa;
+      transform: scale(1.05);
+    }
+
+    /* Easter Egg Heart */
+    .easter-heart {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      font-size: 1.8em;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: transform 0.2s, opacity 0.3s;
+      animation: pulse 1.5s infinite;
+      z-index: 100;
+    }
+
+    .easter-heart:hover {
+      opacity: 1;
+      transform: scale(1.2);
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .secret-popup {
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      background: white;
+      border: 2px solid #ffe1e5;
+      border-radius: 15px;
+      padding: 20px;
+      max-width: 280px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      font-size: 1em;
+      display: none;
+      z-index: 101;
+    }
+
+    /* Talk to Nayan Button */
+    .talk-btn {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background-color: #cce3c1;
+      color: #2e5e2d;
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-weight: bold;
+      font-size: 0.95em;
+      text-decoration: none;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transition: transform 0.2s, background 0.3s;
+      z-index: 99;
+    }
+
+    .talk-btn:hover {
+      background-color: #b7d5aa;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+
+  <header>11 Reasons Why I Love You</header>
+  <div class="subheader">Can't we just kiss already Baby?</div>
+
+  <div class="reason-box" id="reason-box">Loading...</div>
+
+  <div class="buttons">
+    <button id="prev-btn" onclick="prevReason()">Back</button>
+    <button id="next-btn" onclick="nextReason()">Next</button>
+    <a href="11th.html" class="back-home">Back to Home</a>
+  </div>
+
+  <!-- Easter Egg Heart -->
+  <div class="easter-heart" onclick="toggleSecret()">❤️</div>
+
+  <!-- Secret Popup -->
+  <div class="secret-popup" id="secretPopup">
+    <strong>Look...</strong><br />
+    One day, we will be together looking through all of this, I wanna marry you, I have never made all these efforts for anyone and I don't think I'll be able to do any of it again, so let's not all it go waste and let's fix us.
+  </div>
+
+  <!-- Talk to Nayan Button -->
+  <a href="nayanbot.html" class="talk-btn">Talk to Nayan</a>
+
+  <script>
+    const reasons = [
+      "1. Since you came into my life, I have started to think about my future more often, w you in it. Now that I work w some money. I really wanna give it to you in future. You fill me up w motivations. And brightens my day (except the bullying session 🙄) But that somehow makes me wanna make myself a better person too.",
+      "2. You are so funny, You know how to make me laugh. Like yk what they say? If she can make you laugh and giggle, she can make your balls bounce and jiggle 😂. Whenever I'm mad or crying you can suddenly make me laugh out of nowhere.",
+      "3. You smart, intelligent & mature, Academically you are sharp, but yes you are immature a lot too but that makes you more cute hahas (and it also makes me mad too 🙄) But I know you can understand things when your mind cools down. I love that about you.",
+      "4. You secretly care, even though you can't show directly sometimes but you still care. Even if you will be mad you will still text even though late and ask what I'm doing or if I ate. That's really makes me feel twirls my ball hairs for you. You remember and save my details too. I love you for that.",
+      "5. You are very cool girl, You do gym and shi, your music taste is so goated (Even I took your songs hahssh) You are very aggressive. Overall, I love your this cool personality, you know about lots of things like I do. We got lot in common even if we aren't exactly same copy paste person. I think that's what is mutual interests.",
+      "6. You are genuinely so cute, even though you won't agree, and act sigma and non chalant but deep down you are still a silly & cute girl. Whenever you do some random shi, it always makes me smile. Your smile always makes me blush (yes I'm gay) And Your hairs looks good on you and your boboness nose, it looks cute and I absolutely love your real face, remember I saw it when you showed me your lipsync videos..",
+      "7. I love how I never gets bored of you, We can talk endlessly for hours and I'll never say well ts was fun see ya later. I just wanna keep talking and talking about any random shi. You are so fun to talk with and even when you reply in pottasium and one word replies I still enjoy trying to make you laugh or make you unmad hshss.",
+      "8. You are fr so hot and sexy, I have never moaned while stroking and in our first esex, I was fr moaning 😭😭it felt like sex. and I love how we said yeah we will just do it on monthversary and we did it just next day again. I love you as whole but damn you got a yummy body too 🤤 I can't wait to be w you irl, I'll always keep kissing and biting you",
+      "9. You usually don't make big efforts but when you do it really makes me feel like cumming in my pants (And no I'm not taking about esex for now) Like sometimes you will make videos for me or sometimes send me a selfie or video without me asking for it. And sometimes random games and ideas you pull up with.",
+      "10. You are my always my first thought, whenever something happens I always tell you about it first, like when I had accident I told you about it 😭, and whenever I get money I always show you. Even when I'm going to bed I wanna make you my final thought before sleeping and when I wake up... It's always you who I talk w first.",
+      "11. We vibe yk. The night we talked first, we got along very well. I have never felt like this before. When I kept talking w you, I just knew there's something special about us here. And as the time pass I think I have started to believe we fr are eachother's soulmates. Even w fights and arguments, there's something that keeps us together in our hearts.",
+      `<strong>These 11 reasons are just tip of ice berg....</strong><br>
+      I love you for more than just these 🥹<br><br>
+      <strong>Forever yours, always by your side - Your retarded bf, Nayan ❤️</strong>`
+    ];
+
+    let current = 0;
+    const reasonBox = document.getElementById("reason-box");
+    const prevBtn = document.getElementById("prev-btn");
+    const nextBtn = document.getElementById("next-btn");
+
+    function updateReason() {
+      reasonBox.innerHTML = reasons[current];
+      reasonBox.classList.remove("animate");
+      void reasonBox.offsetWidth;
+      reasonBox.classList.add("animate");
+      prevBtn.disabled = current === 0;
+    }
+
+    function nextReason() {
+      current = (current + 1) % reasons.length;
+      updateReason();
+    }
+
+    function prevReason() {
+      current = (current - 1 + reasons.length) % reasons.length;
+      updateReason();
+    }
+
+    function toggleSecret() {
+      const popup = document.getElementById("secretPopup");
+      popup.style.display = popup.style.display === "block" ? "none" : "block";
+    }
+
+    // Initial load
+    updateReason();
+  </script>
+</body>
+</html>

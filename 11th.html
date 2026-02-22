@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>11th Monthversary</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lobster&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Quicksand', sans-serif;
+      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+      min-height: 100%;
+      overflow-x: hidden;
+    }
+
+    header {
+      width: 100%;
+      padding: 10px 10px 10px;
+      background: rgba(255, 255, 255, 0.2);
+      color: black;
+      backdrop-filter: blur(5px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      text-align: center;
+      box-sizing: border-box;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2.2em;
+      font-family: 'Lobster', cursive;
+    }
+
+    header h2 {
+      margin: 5px 0 15px;
+      font-size: 1em;
+      font-weight: 600;
+    }
+
+    .timers {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .timers div {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 10px 20px;
+      border-radius: 10px;
+      min-width: 140px;
+      text-align: center;
+    }
+
+    .main-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 100px 20px 60px;
+      box-sizing: border-box;
+    }
+
+    .card-container {
+      perspective: 1000px;
+    }
+
+    .card {
+      width: 360px;
+      height: 500px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 1s;
+    }
+
+    .flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      background: white;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      border-radius: 20px;
+      padding: 20px;
+      box-sizing: border-box;
+      overflow-y: auto;
+      line-height: 1.5;
+      font-size: 0.95em;
+      text-align: left;
+    }
+
+    .back {
+      transform: rotateY(180deg);
+    }
+
+    button, .link-button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1em;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      text-decoration: none;
+      display: inline-block;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    button {
+      background-color: #ff6f91;
+      color: white;
+    }
+
+    .link-button {
+      background-color: #cce3c1;
+      color: #2e5e2d;
+      font-weight: bold;
+    }
+
+    .link-button:hover {
+      background-color: #b7d5aa;
+      transform: scale(1.03);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Happy 11th Monthversary to my Allyssanator ❤️</h1>
+    <h2>All this just for you because you are mine, To Our 11 months together</h2>
+    <div class="timers">
+      <div>
+        <strong>Time Together:</strong><br />
+        <span id="time-together">Loading...</span>
+      </div>
+      <div>
+        <strong>Time Until 1 Year:</strong><br />
+        <span id="time-left">Loading...</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="main-content">
+    <div class="card-container">
+      <div class="card" id="card">
+        <div class="card-face front">
+          <p>Hahahhs Hayyyy... I'm sorry for making you mad w late gift again did you like fake gift haha😊.</p>
+          
+          <p>Happy 11th Monthversary to my super duper funny cool Allyssa (Formerly Allyson 😂)</p>
+          
+          <p>11 months, that's hell of a longtime. Talking to eachother everyday, Sometimes once a day, Sometimes whole day, for all these 11 months... There's just 1 day we didn't talk. Other than that we talked, loved, fought, argued, cried, laughed, bullied, tried to kos (kill ourselves).</p>
+          
+          <p>All those I love yous, curse words, leaving, also staying, all of it we did to eachother, for eachother. All those times, when I could have left, you could have left but we both stayed, that's the effort worth noting, That's worth staying for, You are worth staying for. Even the pain you give me, I'll endure it because it's worth it, if it means being w you forever, it's worth it. Maybe I really didn't know what real love is until I met you. You changed me, I changed you, some in bad way, some in good way. but the version I see of us together, I don't think it will be like this anywhere.</p>
+          
+          <p>You are special to me, everything you gave me is special to me, that's why I save it, our every memory,  you are a big special part of my small life. Yk, in life that was going nowhere, you gave it purpose of somekind. Something to look forward to other than just money or success. The moment you entered my life, everyday felt different, different than how my life was before, Talking with just 1 person most of day, is boring but you changed it. I talked w you almost every hour (other than sleeping obviously haha) Even that wasn't enough, I wanted to talk more w you, sometimes I wanted to say don't go whenever you had to do some shit. or whenever you wanted to sleep, sometimes I said it too. But even in my imperfections, I still care. I let you sleep and ask you to sleep if my shit will take time. Yk sometimes my chest just ache when you aren't talking with me, that's why I sound aggressive or cold, asking you suddenly if you ate or showered or wyd or where you go. I just wanna know everything about you.</p>
+          <p>As time passed, We have merged with eachother... Do you remember when you said that DNA thing, like when ppl sex eachother they start to look similar. I think it worked here too, even though we never touched eachother physically, maybe I guess we touched eachother emotionally? Do you notice how I was before and as days passed I started to be more like you, talk more like you, even my behaviour is more like you. I say jokes like you. Even when I get mad now I behave like you. and worse thing in this is I even speak like dragon now like you whenever I get very mad. I end up saying things that hurt you even though I didn't mean them. You end up saying things you didn't mean but we just said to eachother thinking yeah this gonna hurt them. Our anger fr trying to start shit between us. Anger is some kind of sin too I think. Now I'll say things like, okay nayan, because you will say or do something that I usually do. Same w you, you will say, you ain't ally, when I'll say or do something that you do. We even start bullying eachother w things we say when we are mad, and laugh about it. I have noticed something here like whatever we laugh about, we stop saying those things yk? I think if we wanna stop something I think we should turn it in joke and laugh about it together I guess. Do you wanna try this way to fix our problems? We need a deep open conversation about it. Not just yeah we will talk about it later but actual talk where we will make plans and start them on the moment. Listening to eachother's feelings. And most importantly, being honest about things and day to day life. Now that I know about you, everything I guess if you haven't left out more. You should tell me exactly what is what. There is no reason or something to hide or change things anymore. I really wanna be w you forever, so let's fix us together. Together we are strong, when we aren't together we just overthinking and shit and then we will blame and accuse. We will fix it together.</p>
+          
+          <p>These gifts and efforts aren't only thing that makes me ask you to stay... it's more than that. It's about you, how I love you, how you love me. Memories means too, these gifts means too, even if we lose it we can make more, we can get back anything, we can make more chats, we can make more gifts or matching pfps, we can get all of this again, even the trust or losing feelings, we can keep them together and grow them back as long as we are together. So stay, stay here w me.
+Our mistakes doesn't defines us but now our present and future actions will. So let's stop repeating mistakes I'm serious. I love you, really, I have never never loved someone this much, have you loved someone this much? I think no you even sent me your body. I think that's a precious gift. How about you give it to me every monthversary if you not gonna make anything hmmmm? 😂 jk or maybe no but the point is, you being w me is gift in itself. I don't need anything else. I always forgive you and try to forget about your mistakes and tells you to not repeat it and give you infinite chances, you don't even realise how much you mean to me and how I don't wanna lose you. Maybe you have just treated me harshly sometimes, I did too. We made eachother cry lot of times. That's just love I guess. I wanna have it in my life forever. The moment I started talking w you, i knew this is the girl I'm gonna date, the moment I saw your body I knew this is my wife I'm gonna fuck everyday because goddam you look so good. I always imagine you w me in my future. I knew when I felt pain without you, I knew you are part of me. I hope I won't kill myself whenever you will go to shower because you take whole ass 1 hour there 😂😂. I'm probably gonna kms if we ever breakup, I'm too emo, I can't handle pain very well so I hurt myself instead. I'm sorry I'm just retarded, weirdo, stupid, bobo gago and whatever you wanna call me but now that you made me fall in love, can you take care of me forever? I'm gonna take care of you forever and do everything for you but can you take care of my heart too? don't Just let it bleed? woah that was poetic, breed me now. I want your baby inside me. Well now go look around more on this website, I added a few more things, Did you like it baby? I made it mostly during our fights and shi in these 2-3 days 😭 because when we weren't fighting we were talking normally so I was just busy w you. Without you, I'm just a retarded boy, with you I feel so awesome, I felt awesome before you too but never like this and now I'm addicted and now I want it, now I want you everyday, every moment. because you are my drug, am I drug to you too?</p>
+
+          <p>I love you... Happy 11th monthversary to us, I pray we celebrate 11th Anniversary like 11.1 years later together so don't make any stupid descisions again. I love you a lot, so much very much. Don't leave me, I'm telling you. hmph. </p>
+        </div>
+        <div class="card-face back">
+          <p>Hahaha Hayyyy… Sorry na ulit kung napagalit kita sa late gift ko, pero nagustuhan mo ba yung fake gift? Hahaha 😊</p>
+
+<p>Happy 11th Monthversary sa pinaka super duper funny at cool na Allyssa (formerly Allyson 😂)</p>
+
+<p>11 months… ang tagal na rin no? Araw-araw tayong nag-uusap, minsan once a day lang, minsan buong araw. Sa loob ng 11 months na 'to… isang araw lang ata yung hindi tayo nag-usap. Bukod dun, araw-araw tayong nagmahalan, nagtalo, nag-away, umiyak, tumawa, nang-asar, at nagbantang mag-kos (kill ourselves 😅).</p>
+
+<p>Lahat ng mga “I love you,” mga mura, mga “aalis na ako,” at mga “hindi, magstay tayo,” lahat yun ginawa natin — para sa isa’t isa. Sa lahat ng pagkakataong pwede na akong umalis, o ikaw, pero hindi natin ginawa. Nagstay tayo. Yun ang effort na worth it. Ikaw ang worth it. Kahit yung sakit na binibigay mo minsan, titiisin ko kung kapalit nun ay makasama ka habang buhay. Siguro nga hindi ko alam ano ang tunay na pagmamahal hanggang sa dumating ka. Binago mo ako, binago rin kita — may bad, may good. Pero yung version natin ngayon, feeling ko, wala nang ibang ganto sa iba.</p>
+
+<p>Mahalaga ka sa’kin. Lahat ng binigay mo mahalaga sa’kin, kaya tinatago ko. Bawat memory natin, importante. Isa kang malaking parte ng maliit kong buhay. Sa buhay kong walang direksyon, binigyan mo ito ng purpose. Ng dahilan para umasa ulit, hindi lang para sa pera o tagumpay. Nung dumating ka sa buhay ko, nag-iba ang araw-araw. Dati boring makipag-usap sa iisang tao buong araw, pero binago mo yun. Halos kada oras tayo magkausap (syempre bukod sa tulog haha). At kahit dun, kulang pa rin. Gusto ko pa lalo makipag-usap sa’yo. Minsan gusto ko sabihin “wag ka muna umalis” kapag may gagawin ka o matutulog ka na. Minsan sinasabi ko rin naman. Pero kahit sa mga imperfections ko, nagca-care pa rin ako. Pinapatulog kita, ina-ask ko na matulog ka pag alam kong tatagal pa ako. Minsan, sumasakit dibdib ko pag wala kang message kaya parang cold or aggressive ako, biglang tatanungin kita kung kumain ka na, naligo, anong ginagawa mo, saan ka pupunta… Gusto ko lang malaman lahat tungkol sa’yo.</p>
+
+<p>Habang lumilipas ang panahon, parang nagsama na tayo ng buo. Naalala mo yung sinabi mong DNA thing? Yung kapag nagse-sex daw, nagiging magkamukha? Well, parang nangyari rin satin kahit wala tayong physical contact. Parang emotionally, nagmerge tayo. Napapansin mo ba? Pati jokes ko, behavior ko, parang ikaw na rin. Pati magalit ako, parang ikaw na. At worse, nagsasalita na rin akong parang dragon kapag galit ako — tulad mo 😂. Nasasabi ko mga bagay na hindi ko naman gustong sabihin pero lumalabas kasi gusto nating saktan isa’t isa sa galit. Tapos pagsisihan. Anger is a sin fr. Ngayon sasabihin ko “Okay Nayan…” kapag ginagawa mo yung ginagawa ko. Tapos ikaw, “You ain’t Ally…” kapag ako naman gumawa ng sayo. Tapos binubully pa natin isa’t isa sa mga sinabi natin habang galit tapos tatawanan nalang natin after. Napansin ko, lahat ng mga tinatawanan natin, nawawala rin sila sa usapan natin. Siguro yun yung sagot — pagtawanan nalang natin ang mga problema natin para matapos na? Gusto mo ba subukan? Kailangan natin ng totoong pag-uusap, hindi yung “later” lang, kundi planuhan at simulan agad. Pakinggan ang isa’t isa. At pinaka-importante: honesty. Sa lahat. Sa araw-araw. Alam ko na halos lahat tungkol sayo — kung may hindi pa ako alam, sabihin mo. Hindi na kailangang magtago o magbago ng kwento. Gusto kong makasama ka habang buhay, so ayusin natin ‘to, together. Kasi kapag together tayo, we’re strong. Pag hindi, puro overthinking lang, tapos mag-aaway pa. So ayusin natin.</p>
+
+<p>Itong mga regalo’t effort ko — hindi lang yun ang dahilan kung bakit gusto kong magstay ka. It’s you. Yung pagmamahal mo, pagmamahal ko. Yung memories natin. Yung gifts — kung mawala man, kaya nating gumawa ulit. Chats, memories, pfps, trust, feelings — lahat yan kaya nating buuin ulit basta magkasama tayo. So please, stay. Stay with me.</p>
+
+<p>Hindi tayo defined ng past mistakes natin, pero defined tayo ng mga actions natin ngayon at sa future. So wag na nating ulitin yung mga mali. I’m serious. Mahal kita. Sobrang mahal. Wala pa akong minahal ng ganito. Ikaw ba? Minahal mo na ba ng ganito? Di nga eh, binigay mo na nga katawan mo sa’kin. That’s a precious gift fr. Gusto mo bang gawin nating monthly gift yan tuwing Monthversary? 😂 Joke lang… or maybe not 😳 But seriously, being with you is the best gift. I always forgive you. Lagi kong sinasabi: wag mo nang ulitin. Paulit-ulit akong nagbibigay ng chances kasi di mo alam kung gaano kita kamahal. Kung gaano ayokong mawala ka. Minsan harsh ka, ako rin. Napaiyak natin ang isa’t isa. Siguro ganun talaga ang love. Gusto ko ito habang buhay.</p>
+
+<p>Nung una kitang nakausap, alam kong ikaw ang gusto kong i-date. Nung nakita ko katawan mo, alam kong ikaw ang gusto kong asawa at… well you know the rest 😂 You’re so damn hot. Lagi kitang iniisip sa future ko. Nung nasaktan ako nung wala ka, dun ko nalaman na parte ka na ng buhay ko. Sana lang di ako magpakamatay habang nasa banyo ka kasi 1 hour ka dun palagi 😂. Baka talaga mag-kms ako pag naghiwalay tayo, emo kasi ako. Di ako marunong humawak ng sakit kaya sarili ko ang sinasaktan ko. Sorry na, siraulo lang talaga ako, weird, stupid, bobo, gago — lahat na. Pero ngayong pinainlove mo na ako… pwede mo na ba akong alagaan habang buhay? Ako, aalagaan kita habang buhay, pero ingatan mo rin puso ko ha? Wag mo lang hayaang dumugo. Grabe poetic yun ah… breed me now. Gusto ko ng baby mo sa loob ko. 😭</p>
+
+<p>Anyway, silipin mo pa website na ‘to. May mga surprises pa ako dyan. Nagawa ko ‘to mostly habang nag-aaway tayo nitong 2–3 days 😭 kasi pag okay tayo, busy ako kakausap sayo. Pero pag wala ka, para akong retarded. Pag kasama kita, ang galing ng feeling. Masaya rin naman ako before, pero hindi ganito. Ngayon addicted na ako. Gusto na kita lagi, araw-araw, every moment. Kasi ikaw ang droga ko. Ako ba, droga mo rin?</p>
+
+<p>I love you… Happy 11th Monthversary sa’tin. I pray na i-celebrate natin ang 11th Anniversary, 11.1 years later, magkasama. So please, wag ka nang gumawa ng mga tanga decisions. Mahal kita. Sobrang sobra. Wag mo ‘kong iwan. Please. Hmph.</p>
+        </div>
+      </div>
+    </div>
+    <button onclick="flipCard()">Flip</button>
+    <a href="reasons.html" class="link-button">11 reasons I love you</a>
+  </div>
+
+  <script>
+    function flipCard() {
+      document.getElementById('card').classList.toggle('flipped');
+    }
+
+    function updateTimers() {
+      const now = new Date();
+      const togetherSince = new Date('2024-06-28T21:11:00+05:30');
+      const oneYearAnniversary = new Date('2025-06-28T00:00:00+05:30');
+
+      const diffTogether = now - togetherSince;
+      const diffAnniversary = oneYearAnniversary - now;
+
+      document.getElementById('time-together').innerText = formatDuration(diffTogether);
+      document.getElementById('time-left').innerText = formatDuration(diffAnniversary);
+    }
+
+    function formatDuration(ms) {
+      const totalSeconds = Math.floor(ms / 1000);
+      const days = Math.floor(totalSeconds / (3600 * 24));
+      const hours = Math.floor((totalSeconds % (3600 * 24)) / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+      return `${days}d ${hours}h ${minutes}m ${seconds}s`;
+    }
+
+    setInterval(updateTimers, 1000);
+    updateTimers();
+  </script>
+</body>
+</html>
