@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Happy 10th Monthversary Ally</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: url('10thbg.jpg') no-repeat center center fixed;
+      background-size: cover;
+      position: relative;
+      color: #2f2f2f;
+      scroll-behavior: smooth;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+    body::before {
+      content: "";
+      background: rgba(255, 255, 255, 0.5);
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: radial-gradient(circle, #c7e8b4 0%, #e1efe4 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      text-align: center;
+    }
+    .overlay h2 {
+      font-size: 2.2rem;
+      margin-bottom: 1rem;
+      color: #333;
+      font-family: 'Quicksand', sans-serif;
+    }
+    .overlay input {
+      padding: 0.8rem 1rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      width: 260px;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .fade-out {
+      opacity: 0;
+      transition: opacity 1s ease;
+      pointer-events: none;
+    }
+    header {
+      background: linear-gradient(145deg, #b3d5a6, #e1efe4);
+      padding: 2.5rem 1rem 4rem;
+      text-align: center;
+      color: #000;
+      font-family: 'Quicksand', sans-serif;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2.4rem;
+      z-index: 2;
+      position: relative;
+    }
+    header p {
+      margin-top: 0.5rem;
+      font-size: 1.2rem;
+      color: #444;
+      z-index: 2;
+      position: relative;
+    }
+    header p.quote {
+      font-size: 1rem;
+      font-style: italic;
+      margin-top: 0.3rem;
+      color: #666;
+    }
+    .floating-hearts {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      overflow: hidden;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .floating-hearts span {
+      position: absolute;
+      bottom: 0;
+      color: #f28b82;
+      font-size: 1.2rem;
+      animation: floatHeart 8s infinite ease-in-out;
+      opacity: 0;
+      transform: scale(0.8);
+    }
+    @keyframes floatHeart {
+      0% {
+        transform: translateY(0) scale(1) rotate(0deg);
+        opacity: 1;
+      }
+      50% {
+        transform: translateY(-60vh) scale(1.2) rotate(180deg);
+        opacity: 0.8;
+      }
+      100% {
+        transform: translateY(-120vh) scale(0.8) rotate(360deg);
+        opacity: 0;
+      }
+    }
+    main {
+      width: 100%;
+    }
+    section {
+      padding: 2.5rem 1.5rem;
+      max-width: 750px;
+      margin: auto;
+    }
+    .love-letter {
+  background: rgba(255, 255, 255, 0.7);
+  background-image: url('your-pattern.jpg'); /* your pattern image */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-blend-mode: lighten; /* or try overlay/soft-light for different effect */
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.06);
+  text-align: center;
+  position: relative;
+}
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      background: #2e2e2e;
+      color: #fff;
+    }
+    #music-control {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 48px;
+      height: 48px;
+      background: #b3d5a6;
+      border: none;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay" id="unlock-screen">
+    <h2>I Love You Baby ❤️</h2>
+    <input type="text" id="unlock-input" placeholder="🤨" />
+  </div>
+
+  <audio id="bg-music" autoplay loop preload="auto">
+    <source src="10thmusic.mp3" type="audio/mpeg" />
+  </audio>
+
+  <button id="music-control">🔊</button>
+
+  <header>
+    <h1>HAPPY 10TH MONTHVERSARY MY BABU ALLY!!!!!</h1>
+    <p>Together since June 28, 2024 🤤</p>
+    <p class="quote">"We gonna stick together 24/7 forever because you are my baby"</p>
+    <div class="floating-hearts"></div>
+  </header>
+
+  <main>
+    <section class="love-letter">
+  <h2>My Special Love Letter to You</h2>
+
+  <p><b>HOYYYYYYYYY BOBONESS!!!!</b></p>
+
+  <p>It's our 10th monthversary today baby, can you believe it... we are together for like 10 months now.... It's not fully 10 months yet because we have to wait for 11:41 pm in your timezone and 9:11 pm in my timezone hah but still!!! it's our monthversary day. Do you remember pala when you thought our relationship will last just 2-3 weeks and now look!!! 10 months. We have came so far, I used to be unemployed, now I have job. You were on vacation and now you finished 1 whole grade and it's your vacation and you are preparing for 12 grade too. And We both are working hard for our career and work or shi.</p>
+
+  <p>Yk baby believe it or not, <b>you are the one I want always</b>, like okay we fight and argue a lot? <b>I'm still gonna choose you</b>? we act retarded and bobo a lot? <b>I'm still gonna marry you</b>. You are so bossy and grumpy and always torturing? Baby.... <b>I'll still love you like this.</b> We've been through so many problems together, finding solutions and making it work, forgiving, loving, touching. And I don't really plan on giving up on you or leaving you. Sometimes I act very gagonessing..... and say that I'll kill myself (I'll actually do fr we leave eachother) but I won't do it because deep down I feel like yeah I'll have to bother ally somehow 🥺 because without ally there is no nally... and nally is car and in car that's where you and me will sex... hah. I know you are smiling rn reading this. or if no you will 🙄 See hah now you are smiling!!!  ok still no? Are you being mad? because <b>I'm gonna be your kid's dad 😂.</b></p>
+
+  <p>And I'm sorry about every moment you felt jealous because of me, or everytime you were overthinking became of me, or everytime you got hurt because of me or everytime your tears fell out of your eyes and they weren't happy tears pala.... <b>I'm sorry about all that...</b> I really don't want anything bad happening to you. I'm sorry I have caused you pain and suffering. I'm not really good and perfect and type of man you want. It's just I fell in love w you, and it have gotten deeper since then and now I realise I really can't be without you.. (ok? I'm being dramatic? no I'm no.) I just try to do good after every mistake and fix them so I can be good boyfriend and good husband, because I know I'm not good husband too... But you always accept me, <b>am I really your only exception pala</b>.</p>
+
+  <p>I feel your love, like even though you are mad and you say some very hurtful things... but still when you calm down <b>I feel your love</b>... I see you in my dreams, walking, talking and being there w me.. I feel so happy and when I wake up and see that you have texted I feel even more better and excited because <b>my baby texted</b>....and whenever we are fighting I'm always just ow ow ow and I see there is no text from you I'm always just grumpy, talking w everyone in grumpy tone like mama ji and om wondering what even happened and I'm like just 😡😡 but the truth is without you <b>I fr don't feel good</b>.... maybe that's why I burst out a lot now because sometimes I feel distant.... can you come closer to me pala....</p>
+
+  <p>I really don't wanna lose you ever and what happened last night... idk I didn't do anything and you didn't too but you were overthinking and then again we fought and argued. I just worked on this website!!! It was so hard because I'm making this for so many days and I didn't have much time pala you have seen me being stressed and busy with work... but I still slowly slowly made it and last night I straight up worked on it... Look there is music too if you haven't noticed, plug earphones and listen while reading baby... you can mute it too by clicking on button I added that feature!!!! I thought I'm working on website and learning some shi I should use my this new skill for next gift hah. <b>Did you like it</b>.... I also planned more sections and features (I won't tell what are they hahaha) but I couldn't add because too much coding so I'll add them slowly. Baby yk I also added a game before under this letter.... but game wasn't good because, too glitchy and not fun... so I removed that and I didn't have time anymore to code new game by myself or chatgpt... so I'll add game here in future too!! just a simple silly game owk. I just made this and stayed up too late..... my head fr hurts I think I should skip but I can't.... but atleast!!! <b>I made it for you naman!!!!</b> I hope you like it!!! I really don't have much to give you all I can give you is this my goofy naman gifts and <b>my love, some stress and my dick 🥺.</b> <b>I love you baby.... I'll always make efforts for you because I love it...</b> I'm not forcing myself for it... <b>I really enjoy doing things for you.... I love everything about you.</b></p>
+
+  <p>And baby, can you stop this "not sending shit anymore" thing.... because it's fr not good like this won't help and it's like making things lowkey bad yk.... If we wanna heal and make eachother feel good again we should do things to make eachother happy, like I'm not saying that, not just me, even ChatGPT said!!! I mean yes it's your choice pala.... but still think about it... holding back affection is never good like you notice sometimes I'm mad or lowkey cold it's just I miss your face pala like it's not about just nudes or something. We can have that whenever we are back to normal but atleast face .....</p>
+
+  <p>Working together is so fun like when we made those images together, we should do more stuff like that!!! It helps in bonding I think and we get used to eachother more. I was so skard and stressed that day then you helped me to finish my work fastur..... <b>I love you for that.</b> I hope we make more things like this bae, also our yt channel!!! we can make stuff there together and start this channel hahas, We planned some stuff too to post we just need to add banner pfp and description etc and we can just start uploading. rest of shi we will do along the way when our channel will grow.</p>
+
+  <p>Before I didn't make gifts for you, I mean I did but not like every monthversary. And like we didn't do anything special on monthversary too....First time was like 3rd... when we did esex for first time hahshs, That day was fr very special day of my life, <b>I hope it was for you too pala...</b> Do you remember? Do you remember love? I miss our esex fr before we had time and privacy so we were doing it everyday 😂😂. Like I be at pink office you will say show dick and if om will be there I'll go to other room and I'll show and whenever he left, we did it. After cumming I would be always cleaning floor w cloth then washing it 😭😭 and before we were always doing esex after fight fr. I hope we do it today or maybe sometime latur because <b>my balls hurts from not cumming it's been days 😢.</b> I miss my ally and son too when you gonna show hashs. Maybe this doing esex everyday time will come again in future? like what if I'm unemployed for sometime again? or maybe when I'm like too independent so I'll have privacy whenever I want 😈. I'm always ready to do it w you but it's your bobo ass saying no no. And talking of ass.... I miss your ass too naman!! I saw it from top and bottom and side too!!!! my baby sent me standing inspection view 😭😭 I was fr so happy and horny that time like smiling and shi but my hand on dih.</p>
+
+  <p>You are so cute too fr like (ok stop right there don't say kadiri 😡) not just w face, you are so cute w face there's no doubt there. Like the way you talk and joke and things you do and how you act is so silly and cute sometimes like ydk how I be smiling and giggling and shi like fr you are only person who can make me mad or cry and suddenly turn me into smiling and laughing. Believe it or not pala .... <b>you are fr the type of girl I always wanted</b>, like you have things in you that I want. And weird is that <b>I love you so much, too deeply that I can't leave you no matter whatever type of fight we end up in.</b> You are fr so special to me... I have never loved or cared for someone or made efforts like this for someone ever before. Maybe it's just true that <b>we are soulmates</b> hah? Because remember yggdrasil thing said 100% when you tried that. And also our matching moles just says it all..... same with our texting at same time like that time it was so weird earlier I was just missing you so I texted on wa and just 1 mins later you unblocked and texted, like odd ahh coincidence. Our life is fr intertwined or something together now. We keep pushing but still coming close. I remember when it was september, and I thought this relationship will just end those 3 months turned into 10, not just doubled, but tripled and more. And now sometimes we think it's end again maybe who knows. these 10 months will double or triple too? <b>I pray for that to God, I pray we never get separated ever.</b></p>
+
+  <p><b>I'm very boboness... but if I'm boboness then you are babyness</b> 😂😂 ok that was cringe joke idc tho I love being cringe w you. To be aware of cringe ess isn't cringeness, once a great man said that 🤔 That's not me haha because I'm legend man 😎. ok ok ik you cringing hard rn.</p>
+
+  <p><b>I thank you baby for being w me and tolerating my annoying ass</b>, Idk I'm very obsessive when I like someone. But <b>I can promise you that I won't leave you</b>, times can be rough and hard on us, but isn't that life? it can't be always easy and straightforward. And <b>I'm willing to put my time and efforts in you for rest of life</b>. Because you are so bobo and awesome pretty baby who <b>I wanna make my wife irl in future</b>, irl because you are already my wife online hahss.</p>
+
+  <p>Can we just meet already, or soon as possible I wanna molest you irl hahshsh jk or maybe no, Like there's 2 side inside me, 1 is that wanna meet you rn or soon as possible but other side is wanting we meet after you turn 18 cuz yk no way gang we just gonna say hi hello after meeting. but fr I wanna meet you soon as possible, There's 100s of other things we can do togethe like going to places, playing games together but like together like irl together sitting together shi or watch movies or just yap or just staring at eachother all day is good idea too because I would love that very much.</p>
+
+  <p><b>Thanks for making me happy and laugh and horny and giving me boners everyday.</b> You also made me sad stressed and emo too but I will have that along w it if it means to be w you forever. <b>I love the time I spend w you</b>, <b>you are literally my favourite girl I ever met</b>. because you are so funny and silly and have a humor that's like me, and you have a goated music taste (yes I steal your songs hahssh) and you are very smart like academically and in maturity too, but you always act bobo when you are in love. and whenever you are mad and your love for me is suddenly 0, you talk like a robot ahh mom who's very mature or something 😂 no pala don't be mad I'm not bashing. <b>I love you okay, Idc, I love you as you are, please never change.</b> And don't leave me too, <b>will you pinky promise me 🥹.</b></p>
+
+  <p><b>I love you forever and always. We will stick together 24/7. We mustn't separate because you are mine. ❤️</b></p>
+</section>
+  </main>
+
+  <footer>
+    From your idiot<br>
+    husbanto Nayan 😂
+  </footer>
+
+  <script>
+    const overlay = document.getElementById('unlock-screen');
+    const unlockInput = document.getElementById('unlock-input');
+    const music = document.getElementById('bg-music');
+    const controlBtn = document.getElementById('music-control');
+    const floatingHearts = document.querySelector('.floating-hearts');
+
+    // Music Control
+    controlBtn.addEventListener('click', () => {
+      if (music.paused) {
+        music.play();
+        controlBtn.textContent = '🔊';
+      } else {
+        music.pause();
+        controlBtn.textContent = '🔇';
+      }
+    });
+
+    // Unlock Screen
+unlockInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    if (unlockInput.value.trim().toLowerCase() === 'i love you more') {
+      overlay.classList.add('fade-out');
+      setTimeout(() => {
+        overlay.style.display = 'none';
+        music.play(); // <=== PLAY MUSIC AFTER UNLOCK
+      }, 1000);
+    } else {
+      unlockInput.value = '';
+      unlockInput.placeholder = 'Try again baby!';
+    }
+  }
+});
+
+    // Floating Hearts
+    for (let i = 0; i < 10; i++) { 
+      const heart = document.createElement('span');
+      heart.textContent = '❤';
+      heart.style.left = Math.random() * 100 + 'vw';
+      heart.style.animationDelay = (Math.random() * 8) + 's';
+      heart.style.fontSize = (Math.random() * 20 + 10) + 'px';
+      floatingHearts.appendChild(heart);
+    }
+
+    // Fade in Music
+    music.volume = 0;
+    music.play();
+    let vol = 0;
+    const fadeIn = setInterval(() => {
+      if (vol < 1) {
+        vol += 0.02;
+        music.volume = vol;
+      } else {
+        clearInterval(fadeIn);
+      }
+    }, 100);
+  </script>
+</body>
+</html>
