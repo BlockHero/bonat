@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notes & Chat</title>
+<style>
+body{margin:0;font-family:system-ui;background:#0b1323;color:#e6eef8;overflow:hidden}
+.hidden{display:none}
+
+/* Topbar */
+.topbar{position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;padding:10px;background:#0f172a;z-index:10}
+.topbar-left{display:flex;align-items:center;gap:8px}
+.topbar img{width:36px;height:36px;border-radius:50%;object-fit:cover}
+.topbar .name{font-weight:600}
+.topbar button{background:none;border:0;color:white;font-size:20px;cursor:pointer}
+
+/* Notes screen */
+#notesScreen{padding:70px 16px;height:100vh;box-sizing:border-box}
+#notesScreen textarea{width:100%;height:80vh;background:none;border:0;color:white;outline:none;font-size:16px}
+#notesToChat{position:fixed;top:10px;left:10px;font-size:26px;background:none;border:0;color:white;cursor:pointer;z-index:20}
+
+/* Chat screen */
+#chatScreen{height:100vh;display:flex;flex-direction:column}
+.messages{flex:1;overflow:auto;padding:16px;margin-bottom:60px} /* reserve space for composer */
+.msg{max-width:70%;padding:8px 10px;border-radius:12px;margin:6px 0;word-break:break-word}
+.me{margin-left:auto;background:#153b5f}
+.them{margin-right:auto;background:#1f2937}
+.sender{font-size:11px;opacity:.7;margin-bottom:2px}
+
+/* Composer fixed above browser bottom */
+.composer{display:flex;gap:8px;padding:10px;position:fixed;bottom:0;left:0;width:100%;background:#0f172a;box-sizing:border-box}
+input[type=text]{flex:1;background:none;border:0;color:white;outline:none;padding:6px}
+button.send{padding:8px 14px;border-radius:10px;background:#60a5fa;color:#07223e;border:0;cursor:pointer}
+.composer.hidden { display: none !important; }
+
+/* Settings popup */
+#settingsModal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);display:flex;justify-content:center;align-items:center;z-index:50;display:none}
+#settingsContent{background:#0f172a;padding:20px;border-radius:12px;width:90%;max-width:400px;position:relative}
+#settingsContent h2{margin-top:0}
+#settingsContent label{display:block;margin-top:12px;margin-bottom:4px}
+#settingsContent input[type=text]{width:100%;padding:6px;border-radius:6px;border:none;background:#1f2937;color:white;outline:none}
+#settingsContent input[type=file]{width:100%;padding:6px;border-radius:6px;border:none;background:#1f2937;color:white;outline:none}
+#settingsContent button{margin-top:16px;padding:8px 12px;border:0;border-radius:6px;background:#60a5fa;color:#07223e;cursor:pointer}
+#closeSettings{position:absolute;top:10px;right:10px;font-size:20px;background:none;border:0;color:white;cursor:pointer}
+.date-sep{text-align:center;opacity:0.6;margin:10px 0}
+</style>
+</head>
+<body>
+
+<!-- NOTES -->
+<section id="notesScreen">
+  <button id="notesToChat">📝</button>
+  <textarea id="notesText" placeholder="Write notes…"></textarea>
+</section>
+
+<!-- CHAT -->
+<section id="chatScreen" class="hidden">
+  <div class="topbar">
+    <div class="topbar-left">
+      <img id="chatPfp">
+      <div class="name" id="chatName"></div>
+    </div>
+    <div>
+      <button id="openSettings">⋮</button>
+      <button id="chatToNotes">📝</button>
+    </div>
+  </div>
+  <div class="messages" id="messages"></div>
+  <div class="composer hidden">
+  <input type="text" id="textInput" placeholder="Message…">
+  <button class="send" id="sendBtn">Send</button>
+</div>
+</section>
+
+<!-- SETTINGS POPUP -->
+<div id="settingsModal">
+  <div id="settingsContent">
+    <button id="closeSettings">✕</button>
+    <h2>Settings</h2>
+    <label>Nickname</label>
+    <input type="text" id="nicknameInput">
+    <label>Profile Picture</label>
+    <input type="file" id="pfpInput" accept="image/*">
+    <button id="logoutBtn">Logout</button>
+  </div>
+</div>
+
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDu59haeg5pNmcLu-DR4YZfv2hqd-5GpPo",
+  authDomain: "al-to-na.firebaseapp.com",
+  projectId: "al-to-na",
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const messagesCol = collection(db,"messages");
+const usersCol = collection(db,"users");
+
+/* STATE */
+let me = localStorage.getItem("loginUser");
+
+/* ELEMENTS */
+const notesScreen = document.getElementById("notesScreen");
+const chatScreen = document.getElementById("chatScreen");
+const notesToChat = document.getElementById("notesToChat");
+const chatToNotes = document.getElementById("chatToNotes");
+const chatName = document.getElementById("chatName");
+const chatPfp = document.getElementById("chatPfp");
+const messagesEl = document.getElementById("messages");
+const textInput = document.getElementById("textInput");
+const sendBtn = document.getElementById("sendBtn");
+
+/* SETTINGS */
+const settingsModal = document.getElementById("settingsModal");
+const openSettings = document.getElementById("openSettings");
+const closeSettings = document.getElementById("closeSettings");
+const nicknameInput = document.getElementById("nicknameInput");
+const pfpInput = document.getElementById("pfpInput");
+const logoutBtn = document.getElementById("logoutBtn");
+
+/* NOTES */
+const notesText = document.getElementById("notesText");
+notesText.value = localStorage.getItem("notes") || "";
+notesText.oninput = e => { localStorage.setItem("notes", e.target.value); };
+
+/* NAV */
+function showChat(){ 
+  notesScreen.classList.add("hidden"); 
+  chatScreen.classList.remove("hidden"); 
+  document.querySelector(".composer").classList.remove("hidden");
+}
+
+function showNotes(){ 
+  chatScreen.classList.add("hidden"); 
+  notesScreen.classList.remove("hidden"); 
+  document.querySelector(".composer").classList.add("hidden");
+}
+
+notesToChat.onclick = async ()=>{
+  if(!me){
+    const name = prompt("Enter your name");
+    if(name !== "Nayan" && name !== "Ally") return;
+    me = name;
+    localStorage.setItem("loginUser", me);
+    const userDoc = doc(db,"users",me);
+    const u = await getDoc(userDoc);
+    if(!u.exists()) await setDoc(userDoc,{nickname:me, pfp:"https://via.placeholder.com/100"});
+  }
+  loadHeader();
+  showChat();
+};
+chatToNotes.onclick = showNotes;
+
+/* HEADER */
+async function loadHeader(){
+  const other = me==="Nayan"?"Ally":"Nayan";
+  const otherDoc = await getDoc(doc(db,"users",other));
+  const otherData = otherDoc.exists() ? otherDoc.data() : {nickname:other, pfp:"https://via.placeholder.com/100"};
+  chatName.textContent = otherData.nickname;
+  chatPfp.src = otherData.pfp;
+}
+
+/* SETTINGS */
+openSettings.onclick = async ()=> {
+  const meDoc = await getDoc(doc(db,"users",me));
+  const meData = meDoc.exists()?meDoc.data():{nickname:me, pfp:"https://via.placeholder.com/100"};
+  nicknameInput.value = meData.nickname;
+  settingsModal.style.display = "flex";
+};
+closeSettings.onclick = ()=>{ settingsModal.style.display="none"; }
+
+nicknameInput.onchange = async e=>{
+  await setDoc(doc(db,"users",me), {nickname:e.target.value}, {merge:true});
+  loadHeader();
+};
+pfpInput.onchange = async e=>{
+  const reader = new FileReader();
+  reader.onload = async ()=> {
+    await setDoc(doc(db,"users",me), {pfp:reader.result}, {merge:true});
+    loadHeader();
+  };
+  reader.readAsDataURL(e.target.files[0]);
+};
+logoutBtn.onclick = ()=>{ localStorage.removeItem("loginUser"); location.reload(); };
+
+/* CHAT */
+sendBtn.onclick = async ()=>{
+  const txt = textInput.value.trim();
+  if(!txt) return;
+  await addDoc(messagesCol,{text:txt,sender:me,ts:serverTimestamp()});
+  textInput.value="";
+};
+
+function formatTimestamp(ts){
+  if(!ts) return {dateLabel:'',timeStr:''};
+  const d = ts.toDate ? ts.toDate() : new Date(ts.seconds*1000);
+  const now = new Date();
+  const diff = new Date(now.getFullYear(),now.getMonth(),now.getDate()) - new Date(d.getFullYear(),d.getMonth(),d.getDate());
+  let dateLabel="";
+  if(diff===0) dateLabel="Today";
+  else if(diff===86400000) dateLabel="Yesterday";
+  else dateLabel=d.toLocaleDateString(undefined,{day:'2-digit',month:'short',year:'numeric'});
+  const timeStr = d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+  return {dateLabel,timeStr};
+}
+
+onSnapshot(query(messagesCol, orderBy("ts","asc")), snap=>{
+  messagesEl.innerHTML="";
+  let lastDate = null;
+  snap.forEach(docSnap=>{
+    const m = docSnap.data();
+    const {dateLabel,timeStr} = formatTimestamp(m.ts);
+    if(dateLabel!==lastDate){
+      const sep = document.createElement("div");
+      sep.className="date-sep";
+      sep.textContent = dateLabel;
+      messagesEl.appendChild(sep);
+      lastDate=dateLabel;
+    }
+    const div = document.createElement("div");
+    div.className="msg "+(m.sender===me?"me":"them");
+    div.innerHTML=`<div class="sender">${m.sender} • ${timeStr}</div>${m.text}`;
+    messagesEl.appendChild(div);
+  });
+  messagesEl.scrollTop=messagesEl.scrollHeight;
+});
+
+/* INIT */
+if(me) loadHeader();
+</script>
+</body>
+</html>
