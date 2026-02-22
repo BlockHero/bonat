@@ -1,0 +1,610 @@
+<!doctype html>
+
+<html lang="en">  
+<head>  
+<meta charset="utf-8" />  
+<meta name="viewport" content="width=device-width,initial-scale=1" />  
+<title>Car Simulator</title>  
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">  
+<style>  
+:root{  
+  --phone-w:380px; --phone-h:780px;  
+  --accent: #9fce8a;  
+  --card: rgba(255,255,255,0.96);  
+  --muted: #6b5368;  
+  --building-dark: #cfcfcf; /* will be darkened further below */  
+}  /* reset */
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0;display:flex;align-items:center;justify-content:center;background:#e9f2ee;font-family:"Poppins",system-ui,-apple-system,Segoe UI,Roboto,Arial}
+.phone{width:var(--phone-w);height:var(--phone-h);border-radius:32px;background:linear-gradient(180deg,#fffdf7,#f6fff0);box-shadow:0 30px 80px rgba(20,20,30,0.12);position:relative;overflow:hidden}
+
+/* status */
+.statusbar{position:absolute;top:0;left:0;right:0;height:46px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;z-index:220;font-weight:700;color:#3b2b3f}
+.status-right{opacity:0.95}
+
+/* notification shade (with music controls) */
+.notif-shade{position:absolute;left:10px;right:10px;top:10px;height:56%;background:var(--card);border-radius:16px;z-index:420;padding:12px;box-shadow:0 20px 50px rgba(0,0,0,0.12);transform:translateY(-130%);transition:transform 300ms cubic-bezier(.2,.9,.3,1);pointer-events:none}
+.notif-shade.open{transform:translateY(0);pointer-events:auto}
+.shade-handle{width:72px;height:6px;border-radius:6px;margin:8px auto;background:linear-gradient(90deg,#ffd1e0,var(--accent))}
+
+/* music control inside shade */
+.music-row{display:flex;align-items:center;gap:12px;margin-top:8px}
+.track-info{flex:1;font-weight:700;color:#3b2b3f}
+.progress-wrap{height:8px;background:#e6f1df;border-radius:10px;overflow:hidden;cursor:pointer}
+#musicProgress{height:100%;width:0;background:linear-gradient(90deg,var(--accent),#ff9fbf);transition:width .08s linear}
+.music-btn{width:44px;height:44px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;cursor:pointer}
+
+/* app header */
+.app-header{position:absolute;top:56px;left:10px;right:10px;height:42px;display:flex;align-items:center;padding:0 12px;z-index:210}
+.app-title{font-weight:800;color:#45303f;flex:1}
+
+/* app screen */
+.app-screen{position:absolute;top:100px;left:10px;right:10px;bottom:86px;border-radius:16px;background:transparent;z-index:200;overflow:hidden;padding:8px}
+
+/* room & world */
+.room{width:100%;height:100%;position:relative;border-radius:12px;background:linear-gradient(180deg,#fffef6,#f8fff5);overflow:hidden}
+.world{position:absolute;left:0;top:0;width:1400px;height:900px;transform-origin:0 0}
+
+/* zones (visual groups) */
+.zone{position:absolute;border-radius:10px;background:linear-gradient(180deg,#f7f7f7,#f2fff5);box-shadow:0 8px 24px rgba(0,0,0,0.04)}
+
+/* Buildings slightly darker */
+.building{position:absolute;border-radius:8px;background:#bdbdbd;box-shadow:0 10px 26px rgba(0,0,0,0.08);display:flex;align-items:center;justify-content:center;font-size:18px;color:#4a3b44}
+
+/* cat (emoji) */
+.cat{position:absolute;width:84px;height:84px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:44px;z-index:300;pointer-events:none;background:linear-gradient(180deg,#fff,#fff7f2);box-shadow:0 14px 34px rgba(0,0,0,0.12)}
+.mood{position:absolute;top:-28px;left:50%;transform:translateX(-50%);background:var(--card);padding:6px 8px;border-radius:10px;font-weight:700;opacity:0;transition:opacity .18s}
+
+/* items/npcs */
+.item{position:absolute;width:56px;height:56px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:28px;cursor:pointer;user-select:none}
+.npc{position:absolute;font-size:30px}
+
+/* HUD (small, top-left) */
+.hud{position:absolute;left:12px;top:12px;z-index:420;display:flex;flex-direction:column;gap:6px}
+.small-bar{width:140px;background:var(--card);padding:6px;border-radius:10px;font-weight:700;color:#3b2b3f;border:1px solid rgba(0,0,0,0.03)}
+.progress{height:8px;background:#eee;border-radius:6px;overflow:hidden}
+.fill{height:100%;background:linear-gradient(90deg,var(--accent),#86c05b);width:50%}
+
+/* missions panel */
+.missions{position:absolute;right:0px;top:0px;width:170px;background:var(--card);z-index:420;padding:8px;border-radius:12px;box-shadow:0 12px 30px rgba(0,0,0,0.08);font-size:13px}
+
+/* inventory */
+.inv{position:absolute;left:14px;bottom:14px;background:var(--card);padding:8px;border-radius:12px;z-index:420;display:flex;gap:8px;box-shadow:0 12px 30px rgba(0,0,0,0.08)}
+.inv .slot{width:40px;height:40px;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:20px}
+
+/* joystick */
+.joy-wrap{position:absolute;right:12px;bottom:12px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.7);z-index:420;display:flex;align-items:center;justify-content:center;touch-action:none}
+.joy-knob{width:56px;height:56px;border-radius:50%;background:var(--accent);box-shadow:0 8px 20px rgba(0,0,0,0.12);transform:translate(0,0);transition:transform .04s linear}
+
+/* bottom dock (Back then Home) */
+.dock{position:absolute;left:10px;right:10px;bottom:12px;height:64px;display:flex;align-items:center;justify-content:center;gap:22px;z-index:420}
+.nav-btn{width:60px;height:60px;border-radius:12px;background:var(--card);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:22px;box-shadow:0 12px 30px rgba(0,0,0,0.08)}
+
+.status-box {
+  background: rgba(255,255,255,0.8);
+  padding: 6px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 140px; /* adjust as needed */
+}
+
+.status-row {
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+}
+
+.status-row .progress {
+  width: 100%;
+  height: 6px;
+  background: #ddd;
+  border-radius: 4px;
+  margin-top: 2px;
+}
+
+.fill {
+  height: 100%;
+  background: #4caf50;
+  width: 0%;
+  border-radius: 4px;
+}
+
+.message-notif {
+  margin-top: 16px;
+  background: #e7eee2;
+  padding: 12px 14px;
+  border-radius: 12px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+  font-size: 14px;
+  color: #333;
+}
+
+.message-sender {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.message-text {
+  opacity: 0.85;
+}
+
+</style>  
+</head>
+
+<body>  
+<div class="phone" id="phone">    <!-- status -->    <div class="statusbar">  
+    <div>Car Simulator 😸</div>  
+    <div class="status-right">A❤️N 🛜</div>  
+  </div>    <!-- notification shade (with music controls) -->    <div class="notif-shade" id="notifShade">  
+    <div class="shade-handle"></div>  
+    <div style="text-align:center;font-weight:800;color:#4a2f48">Notifications</div>  <div class="music-row" style="margin-top:10px">  
+  <div class="track-info" id="trackTitle">Car Simulator Music</div>  
+  <div class="progress-wrap" id="musicSeek"><div id="musicProgress"></div></div>  
+  <div id="musicBtn" class="music-btn">▶️</div>
+  <!-- Inside .notif-shade, under .music-controls -->
+<div class="message-notif">
+  <div class="message-sender">Nayan Husbanto</div>
+  <div class="message-text">reply????????</div>
+</div>  
+</div>
+
+  </div>    <!-- header -->    <div class="app-header">  
+    <div class="app-title">Explore da shi</div>  
+  </div>    <!-- app screen -->    <div class="app-screen">
+      <div id="startScreen" style="
+    position:absolute;top:0;left:0;width:100%;height:100%;
+    background:rgba(0,0,0,0.6);display:flex;
+    justify-content:center;align-items:center;
+    z-index:9999;
+">
+    <button id="startBtn" style="
+        padding:20px 50px;
+        font-size:24px;
+        border:none;
+        border-radius:12px;
+        background:#ffcc00;
+        cursor:pointer;
+    ">Start</button>
+</div>
+    <div class="room" id="room">  
+      <div class="world" id="world">  
+        <!-- zones -->  
+        <div class="zone" id="zone_home" style="left:40px;top:40px;width:360px;height:260px;"></div>  
+        <div class="zone" id="zone_park" style="left:440px;top:40px;width:400px;height:260px;"></div>  
+        <div class="zone" id="zone_shop" style="left:900px;top:40px;width:420px;height:260px;"></div>  
+        <div class="zone" id="zone_cave" style="left:240px;top:360px;width:420px;height:380px;"></div>  <!-- darker buildings (example set) -->  
+    <div class="building" style="left:60px;top:80px;width:120px;height:90px;background:#9f9f9f">Home</div>  
+    <div class="building" style="left:480px;top:80px;width:160px;height:110px;background:#a8a8a8">Park</div>  
+    <div class="building" style="left:920px;top:80px;width:140px;height:100px;background:#9b9b9b">Shop</div>  
+    <div class="building" style="left:260px;top:420px;width:180px;height:130px;background:#aaaaaa">Cave</div>  
+
+    <!-- items & NPCs will spawn by script -->  
+    <!-- cat (emoji) - will be positioned on road at init -->  
+  <div class="cat" id="cat">🐱<div class="mood" id="mood">😊</div></div>  
+  </div>  
+
+  <!-- HUD (small, top-left) -->  
+  <div class="hud">
+  <div class="small-bar">Lvl <span id="lvl">1</span> • XP <span id="xp">0</span></div>
+
+  <!-- Combined status box -->
+  <div class="status-box">
+    <div class="status-row">
+      <span>Hunger</span>
+      <div class="progress"><div id="hungerFill" class="fill"></div></div>
+    </div>
+    <div class="status-row">
+      <span>Energy</span>
+      <div class="progress"><div id="energyFill" class="fill"></div></div>
+    </div>
+    <div class="status-row">
+      <span>Happy</span>
+      <div class="progress"><div id="happyFill" class="fill"></div></div>
+    </div>
+  </div>
+</div>
+
+  <!-- missions -->  
+  <div class="missions" id="missions">  
+    <div style="font-weight:800;margin-bottom:6px">Missions</div>  
+    <div id="missionList">Collect 3 toys</div>  
+  </div>  
+
+  <!-- inventory -->  
+  <div class="inv" id="inv">  
+    <div class="slot" id="slot1">—</div>  
+    <div class="slot" id="slot2">—</div>  
+    <div class="slot" id="slot3">—</div>  
+  </div>  
+
+  <!-- joystick -->  
+  <div class="joy-wrap" id="joyWrap"><div class="joy-knob" id="joyKnob"></div></div>  
+
+</div>
+
+  </div>    <!-- bottom dock: Back then Home -->    <div class="dock">  
+    <div class="nav-btn" id="backBtn">⬅</div>  
+    <div class="nav-btn" id="homeBtn">🏠</div>  
+  </div>  
+</div>
+
+<script>
+    const startScreen = document.getElementById('startScreen');
+const startBtn = document.getElementById('startBtn');
+
+startBtn.addEventListener('click', ()=>{
+    // hide overlay
+    startScreen.style.display = 'none';
+
+    // trigger music
+    tryPlayMusic();
+
+    // start joystick input and main game loop
+    last = performance.now();
+    requestAnimationFrame(mainLoop);
+});
+      
+/* ---------------------- Part 3 — rebuilt (camera fixed) ---------------------- */  
+localStorage.removeItem('petcity_insane_v1');  
+localStorage.removeItem('petcity_day');  
+  
+/* ---------------------- DOM references ---------------------- */  
+const phone = document.getElementById('phone');  
+const world = document.getElementById('world');  
+const catEl = document.getElementById('cat');  
+const moodEl = document.getElementById('mood');  
+const joyWrap = document.getElementById('joyWrap');  
+const joyKnob = document.getElementById('joyKnob');  
+  
+const hungerFill = document.getElementById('hungerFill');  
+const energyFill = document.getElementById('energyFill');  
+const happyFill = document.getElementById('happyFill');  
+const missionsEl = document.getElementById('missionList');  
+const invSlots = [document.getElementById('slot1'), document.getElementById('slot2'), document.getElementById('slot3')];  
+  
+const backBtn = document.getElementById('backBtn');  
+const homeBtn = document.getElementById('homeBtn');  
+  
+const musicBtn = document.getElementById('musicBtn');  
+const musicProgress = document.getElementById('musicProgress');  
+const musicSeek = document.getElementById('musicSeek');  
+const trackTitle = document.getElementById('trackTitle');  
+  
+/* ---------------------- Audio (notif music control) ---------------------- */  
+const bgAudio = new Audio();  
+bgAudio.src = "17music5.mp3"; // <-- add your audio url here if you want  
+bgAudio.loop = true;  
+bgAudio.preload = 'auto';  
+let musicUnlocked = false;  
+function tryPlayMusic(){  
+  if(!musicUnlocked){  
+    bgAudio.play().then(()=>{ musicUnlocked = true; if(musicBtn) musicBtn.textContent = '⏸️'; }).catch(()=>{});  
+  }  
+}  
+if(musicBtn){  
+  musicBtn.addEventListener('click', ()=>{  
+    if(bgAudio.paused) bgAudio.play().then(()=>musicBtn.textContent='⏸️').catch(()=>{});  
+    else { bgAudio.pause(); musicBtn.textContent='▶️'; }  
+  });  
+}  
+bgAudio.addEventListener('timeupdate', ()=> {  
+  if(bgAudio.duration && musicProgress) musicProgress.style.width = (bgAudio.currentTime / bgAudio.duration) * 100 + '%';  
+});  
+if(musicSeek){  
+  musicSeek.addEventListener('click', (e)=>{  
+    if(!bgAudio.duration) return;  
+    const r = musicSeek.getBoundingClientRect();  
+    const pct = (e.clientX - r.left)/r.width;  
+    bgAudio.currentTime = pct * bgAudio.duration;  
+  });  
+}  
+['touchstart','mousedown','keydown'].forEach(evt => document.addEventListener(evt, tryPlayMusic, {once:false}));  
+  
+/* ---------------------- Persistent state ---------------------- */  
+const STORAGE = 'petcity_insane_v1';  
+let state = {  
+  x: 520, y: 200, zone: 'park',  
+  hunger: 90, energy: 90, happy: 80,  
+  xp: 0, lvl: 1,  
+  inventory: [],  
+  missions: [{id:1,text:'Collect 3 toys',target:3,progress:0,done:false}],  
+  day: Number(localStorage.getItem('petcity_day') || 0)  
+};  
+function load(){ try{ const s = JSON.parse(localStorage.getItem(STORAGE)); if(s) state = Object.assign(state,s); }catch(e){} }  
+function save(){ localStorage.setItem(STORAGE, JSON.stringify(state)); }  
+  
+/* ---------------------- World constants ---------------------- */  
+const WORLD_W = 1400;  
+const WORLD_H = 900;  
+if(world){  
+  world.style.width = WORLD_W + 'px';  
+  world.style.height = WORLD_H + 'px';  
+}  
+  
+/* ---------------------- Spawn items ---------------------- */  
+function spawnItem(type, x, y){  
+  const el = document.createElement('div');  
+  el.className = 'item';  
+  el.textContent = type === 'food' ? '🍎' : type === 'toy' ? '🎁' : '🌟';  
+  el.style.left = x + 'px';  
+  el.style.top = y + 'px';  
+  world.appendChild(el);  
+  el.addEventListener('click', ()=> collectItem(type, el));  
+  setTimeout(()=>{ if(el.parentNode) el.remove(); }, 14000);  
+}  
+function initialSpawn(){  
+  spawnItem('toy', 500, 120);  
+  spawnItem('food', 200, 120);  
+  spawnItem('toy', 980, 140);  
+  spawnItem('special', 350, 480);  
+}  
+initialSpawn();  
+  
+/* ---------------------- Inventory / collect / missions ---------------------- */  
+function collectItem(type, el){  
+  if(!el || el.collected) return;  
+  el.collected = true;  
+  if(el.parentNode) el.remove();  
+  if(state.inventory.length < 3){  
+    state.inventory.push(type);  
+    invSlots[state.inventory.length-1].textContent = (type==='toy'?'🎁':type==='food'?'🍎':'🌟');  
+    showMood(type==='toy'?'Yay! 🎁':type==='food'?'Yum! 🍎':'Found! 🌟');  
+  } else {  
+    if(type==='food'){ state.hunger = Math.min(100, state.hunger + 8); showMood('Snack! 🍎'); }  
+    else { state.happy = Math.min(100, state.happy + 6); showMood('Nice! 🎁'); }  
+  }  
+  state.missions.forEach(m=>{  
+    if(!m.done && m.id===1 && type==='toy'){  
+      m.progress++;  
+      if(m.progress>=m.target){ m.done=true; state.xp += 80; showMood('Mission complete ⭐'); }  
+    }  
+  });  
+  save(); updateHUD();  
+}  
+  
+/* ---------------------- HUD update ---------------------- */  
+function updateHUD(){  
+  const lvlEl = document.getElementById('lvl');  
+  const xpEl = document.getElementById('xp');  
+  if(lvlEl) lvlEl.textContent = state.lvl;  
+  if(xpEl) xpEl.textContent = state.xp;  
+  if(hungerFill) hungerFill.style.width = Math.round(state.hunger) + '%';  
+  if(energyFill) energyFill.style.width = Math.round(state.energy) + '%';  
+  if(happyFill) happyFill.style.width = Math.round(state.happy) + '%';  
+  if(missionsEl) missionsEl.innerHTML = state.missions.map(m=>`${m.text} — ${m.progress}/${m.target} ${m.done? '✅':''}`).join('<br>');  
+  invSlots.forEach((s,i)=> {  
+    if(!s) return;  
+    s.textContent = state.inventory[i] ? (state.inventory[i]==='toy'?'🎁':state.inventory[i]==='food'?'🍎':'🌟') : '—';  
+  });  
+}  
+  
+/* ---------------------- Mood popup ---------------------- */  
+let moodTimer;  
+function showMood(txt, ms=1200){  
+  if(!moodEl) return;  
+  moodEl.textContent = txt;  
+  moodEl.style.opacity = 1;  
+  clearTimeout(moodTimer);  
+  moodTimer = setTimeout(()=> moodEl.style.opacity = 0, ms);  
+}  
+  
+/* ---------------------- Joystick (DOM) ---------------------- */  
+let joyActive = false;  
+let joyCenter = {x:0,y:0};  
+const MAXJOY = 36;  
+let moveX = 0, moveY = 0;  
+  
+if(joyWrap){  
+  joyWrap.addEventListener('touchstart', e=>{  
+    joyActive = true;  
+    const r = joyWrap.getBoundingClientRect();  
+    joyCenter = {x: r.left + r.width/2, y: r.top + r.height/2};  
+    e.preventDefault();  
+  });  
+  joyWrap.addEventListener('touchmove', e=>{  
+    if(!joyActive) return;  
+    const t = e.touches[0];  
+    const dx = t.clientX - joyCenter.x, dy = t.clientY - joyCenter.y;  
+    const dist = Math.hypot(dx,dy);  
+    const ang = Math.atan2(dy,dx);  
+    const d = Math.min(dist, MAXJOY);  
+    const ox = Math.cos(ang)*d, oy = Math.sin(ang)*d;  
+    if(joyKnob) joyKnob.style.transform = `translate(${ox}px, ${oy}px)`;  
+    moveX = (ox / MAXJOY) * 1.8;  
+    moveY = (oy / MAXJOY) * 1.8;  
+    e.preventDefault();  
+  });  
+  joyWrap.addEventListener('touchend', ()=>{  
+    joyActive = false; if(joyKnob) joyKnob.style.transform = 'translate(0,0)'; moveX = moveY = 0;  
+  });  
+  /* mouse fallback */  
+  joyWrap.addEventListener('mousedown', e=>{  
+    joyActive = true;  
+    const r = joyWrap.getBoundingClientRect();  
+    joyCenter = {x: r.left + r.width/2, y: r.top + r.height/2};  
+  });  
+}  
+document.addEventListener('mousemove', e=>{  
+  if(!joyActive) return;  
+  const dx = e.clientX - joyCenter.x, dy = e.clientY - joyCenter.y;  
+  const dist = Math.hypot(dx,dy);  
+  const ang = Math.atan2(dy,dx);  
+  const d = Math.min(dist, MAXJOY);  
+  const ox = Math.cos(ang)*d, oy = Math.sin(ang)*d;  
+  if(joyKnob) joyKnob.style.transform = `translate(${ox}px, ${oy}px)`;  
+  moveX = (ox / MAXJOY) * 1.8;  
+  moveY = (oy / MAXJOY) * 1.8;  
+});  
+document.addEventListener('mouseup', ()=>{ if(joyActive){ joyActive=false; if(joyKnob) joyKnob.style.transform='translate(0,0)'; moveX=moveY=0; } });  
+  
+/* ---------------------- Prevent shade swipe while joystick in use ---------------------- */  
+let startY = 0;  
+if(phone){  
+  phone.addEventListener('touchstart', e=>{ if(e.touches) startY = e.touches[0].clientY; });  
+  phone.addEventListener('touchmove', e=>{  
+    if(joyActive) return;  
+    if(!e.touches) return;  
+    const dy = e.touches[0].clientY - startY;  
+    const notifShade = document.getElementById('notifShade');  
+    if(dy > 60 && notifShade) notifShade.classList.add('open');  
+    if(dy < -60 && notifShade) notifShade.classList.remove('open');  
+  });  
+}  
+  
+/* ---------------------- Camera & cat positioning (REBUILT) ---------------------- */  
+  
+/* Single clean camera system:  
+   - setCatPos updates cat position and calls updateCamera  
+   - updateCamera centers cat in viewport and clamps to world bounds  
+   - no duplicate camera blocks anywhere  
+*/  
+  
+function setCatPos(x, y) {  
+  state.x = x;  
+  state.y = y;  
+  
+  // position cat element inside the world (world is translated)  
+  if(catEl){  
+    catEl.style.left = x + 'px';  
+    catEl.style.top = y + 'px';  
+  }  
+  
+  // update camera transform  
+  updateCamera();  
+}  
+  
+function updateCamera(){  
+  const room = document.getElementById('room');  
+  if(!room || !world) return;  
+  
+  // viewport size (the visible phone "room" area)  
+  const roomW = room.clientWidth;  
+  const roomH = room.clientHeight;  
+  
+  // target camera translation to center the cat (account for cat size)  
+  const catW = catEl ? catEl.offsetWidth : 0;  
+  const catH = catEl ? catEl.offsetHeight : 0;  
+  
+  let camX = Math.round(roomW / 2 - state.x - catW/2);  
+  let camY = Math.round(roomH / 2 - state.y - catH/2);  
+  
+  // clamp camera so world doesn't show empty space  
+  const minX = Math.min(0, roomW - WORLD_W);  
+  const maxX = 0;  
+  const minY = Math.min(0, roomH - WORLD_H);  
+  const maxY = 0;  
+  
+  if(camX < minX) camX = minX;  
+  if(camX > maxX) camX = maxX;  
+  if(camY < minY) camY = minY;  
+  if(camY > maxY) camY = maxY;  
+  
+  world.style.transform = `translate(${camX}px, ${camY}px)`;  
+}  
+  
+/* helper: ensure road spawn in park */  
+function placeCatOnRoad(){  
+  const park = {x:440,y:40,w:400,h:260};  
+  const rx = Math.round(park.x + park.w/2 + (Math.random()*40 - 20));  
+  const ry = Math.round(park.y + park.h*0.6 + (Math.random()*30 - 15));  
+  setCatPos(rx, ry);  
+}  
+  
+/* ---------------------- Movement step & main loop ---------------------- */  
+function step(dt){  
+  state.x = Math.max(20, Math.min(WORLD_W - 80, state.x + moveX * dt));  
+  state.y = Math.max(20, Math.min(WORLD_H - 80, state.y + moveY * dt));  
+  setCatPos(state.x, state.y);  
+  
+  document.querySelectorAll('.item').forEach(el=>{  
+    const rx = parseInt(el.style.left), ry = parseInt(el.style.top);  
+    if(Math.hypot(state.x - rx, state.y - ry) < 40) collectItem(el.textContent==='🍎' ? 'food' : el.textContent==='🎁' ? 'toy' : 'special', el);  
+  });  
+  
+  state.hunger = Math.max(0, state.hunger - 0.002 * dt);  
+  state.energy = Math.max(0, state.energy - 0.001 * dt);  
+  state.happy = Math.max(0, state.happy - 0.001 * dt);  
+  if(Math.random() < 0.002) state.xp += 1;  
+  const need = state.lvl * 100;  
+  if(state.xp >= need){ state.xp -= need; state.lvl++; showMood('Level ' + state.lvl + ' ⭐',1200); }  
+  updateHUD();  
+}  
+  
+/* spawn random items & events */  
+function spawnRandom(){  
+  const types = ['toy','food','special'];  
+  const t = types[Math.floor(Math.random()*types.length)];  
+  const x = 60 + Math.random()*(WORLD_W - 200);  
+  const y = 60 + Math.random()*(WORLD_H - 200);  
+  spawnItem(t,x,y);  
+  
+  if(Math.random() < 0.06) {  
+    const ev = Math.random();  
+    if(ev < 0.4) { showMood('Found a shiny!',900); state.xp += 6; }  
+    else if(ev < 0.7) { showMood('Sneezed 🤧',700); state.happy = Math.max(0,state.happy - 6); }  
+    else { showMood('Butterfly 🦋',900); state.happy = Math.min(100,state.happy + 8); }  
+    save(); updateHUD();  
+  }  
+}  
+setInterval(spawnRandom, 4500);  
+  
+/* day/night */  
+function updateDay(){  
+  state.day += 0.0009;  
+  if(state.day > 1) state.day = 0;  
+  localStorage.setItem('petcity_day', state.day);  
+  const t = state.day; const dark = Math.sin(t*Math.PI);  
+  const room = document.querySelector('.room');  
+  if(room) room.style.background = `linear-gradient(180deg, rgba(255,255,255,${0.6 - 0.3*dark}), rgba(248,255,245,${0.95 - 0.3*dark}))`;  
+}  
+setInterval(updateDay, 60);  
+  
+/* ---------------------- Init & loop ---------------------- */  
+load();  
+updateHUD();  
+initialSpawn();  
+  
+// only place cat on road if coordinates are invalid  
+if(!state.x || !state.y || isNaN(state.x) || isNaN(state.y) ||  
+   state.x < 20 || state.y < 20 || state.x > WORLD_W - 80 || state.y > WORLD_H - 80) {  
+    placeCatOnRoad();  
+} else {  
+    setCatPos(state.x, state.y); // properly center camera for loaded position  
+}  
+  
+let last = performance.now();  
+function mainLoop(now){  
+  const dt = Math.min(40, now - last) / 16.666;  
+  last = now;  
+  step(dt);  
+  requestAnimationFrame(mainLoop);  
+}  
+requestAnimationFrame(mainLoop);  
+  
+/* controls: back/home and inventory usage */  
+if(backBtn) backBtn.addEventListener('click', ()=> history.back());  
+if(homeBtn) homeBtn.addEventListener('click', ()=> window.location='17th.html');  
+  
+invSlots.forEach((slot, idx)=>{  
+  if(!slot) return;  
+  slot.addEventListener('click', ()=>{  
+    const it = state.inventory[idx];  
+    if(!it) return;  
+    if(it === 'food'){ state.hunger = Math.min(100,state.hunger + 20); showMood('Ate food 🍎'); }  
+    else if(it === 'toy'){ state.happy = Math.min(100,state.happy + 25); showMood('Played! 🎾'); }  
+    else { state.energy = Math.min(100,state.energy + 18); showMood('Used! 🌟'); }  
+    state.inventory.splice(idx,1);  
+    invSlots.forEach((s,i)=> { if(s) s.textContent = state.inventory[i] ? (state.inventory[i]==='toy'?'🎁':state.inventory[i]==='food'?'🍎':'🌟') : '—'; });  
+    save(); updateHUD();  
+  });  
+});  
+  
+/* reset helper */  
+window.resetPetCity = function(){ localStorage.removeItem(STORAGE); localStorage.removeItem('petcity_day'); alert('State cleared — reload to reset.'); };  
+/* ---------------------- End Part 3 (rebuilt) ---------------------- */  
+</script>
+
+</body>
+</html>
