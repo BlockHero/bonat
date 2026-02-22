@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gallery</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&family=Poppins&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to bottom, #ffe3ec, #e6f5e6);
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    .menu-icon {
+      font-size: 24px;
+      cursor: pointer;
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      z-index: 1100;
+      background: #d5eadf;
+      padding: 0.3rem 0.6rem;
+      border-radius: 8px;
+    }
+    .header {
+      padding: 3rem 1rem 2rem;
+      background-color: #d5eadf;
+      text-align: center;
+      position: relative;
+    }
+    .headline {
+      font-family: 'Dancing Script', cursive;
+      font-size: 2rem;
+      color: #3a7e62;
+      margin: 0.5rem 0 0.2rem;
+    }
+    .subheading {
+      font-size: 1.1rem;
+      color: #5a8c79;
+      margin: 0;
+    }
+    .side-menu {
+      position: fixed;
+      top: 0;
+      left: -250px;
+      width: 220px;
+      height: 100%;
+      background-color: #fce4ec;
+      padding-top: 4rem;
+      transition: 0.3s;
+      z-index: 1000;
+      overflow-y: auto;
+      border-right: 2px solid #ffd1dc;
+    }
+    .side-menu.show {
+      left: 0;
+    }
+    .side-menu ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .side-menu li {
+      padding: 10px 20px;
+    }
+    .side-menu a {
+      text-decoration: none;
+      color: #3a7e62;
+      font-weight: bold;
+      display: block;
+    }
+    .submenu {
+      display: none;
+      padding-left: 15px;
+    }
+    .has-submenu > a::after {
+      content: " \25BC";
+      font-size: 0.8rem;
+    }
+    .has-submenu.open .submenu {
+      display: block;
+    }
+    .arrow-down {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #3a7e62;
+      transition: transform 0.3s ease;
+    }
+    .has-submenu.open .arrow-down {
+      transform: rotate(180deg);
+    }
+    .main {
+      padding: 2rem;
+      text-align: center;
+    }
+    .main section {
+      margin-bottom: 2rem;
+    }
+    .main h2 {
+      color: #3a7e62;
+      margin-bottom: 0.5rem;
+    }
+    .main a {
+      color: #ff69b4;
+      font-weight: bold;
+      text-decoration: none;
+    }
+    .main a:hover {
+      text-decoration: underline;
+    }
+    .footer {
+      text-align: center;
+      padding: 1rem;
+      background-color: #e0f7fa;
+      font-size: 0.9rem;
+      color: #555;
+      margin-top: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="menu-icon" onclick="toggleMenu()">☰</div>
+  <div id="menu-container"></div>
+
+  <header class="header">
+    <h1 class="headline">Gallery</h1>
+    <p class="subheading">Filled with our all memories ❤️</p>
+  </header>
+
+  <main class="main">
+    <!-- Hero Image Section -->
+    <section>
+      <img src="gallerybanner.jpg" alt="Hero Image" style="width: 100%; max-height: 300px; object-fit: cover; border-radius: 12px;" />
+    </section>
+
+    <!-- Section 1: Chat Screenshots -->
+    <section>
+      <h2>Our Chat Screenshots</h2>
+      <p><a href="https://drive.google.com/drive/folders/1Fn2dtKKhu40mFH7EMxaWXEXXbeciQF8A" target="_blank">Click here</a></p>
+    </section>
+
+    <!-- Section 2: Game Dates -->
+    <section>
+      <h2>Our Game Dates</h2>
+      <ul style="list-style: none; padding-left: 0;">
+        <li><a href="https://drive.google.com/drive/folders/1r94MW_QLVKd9HTj3WGBLwR2h6kvMTVBF" target="_blank">Roblox</a></li>
+        <li><a href="https://drive.google.com/drive/folders/1p4_8mZnMXWKmpeslZpMLI3-QoWAujKQ0" target="_blank">Minecraft</a></li>
+        <li><a href="https://drive.google.com/drive/folders/1phmLwzTrW1QtwXpiqyF7aiFkAj9W1ydS" target="_blank">Spider Horror Multiplayer</a></li>
+        <li><a href="https://drive.google.com/drive/folders/1Fk2RKxmuFlgYSw3J6MXMGUb77NsG17it" target="_blank">Mimicry</a></li>
+        <li><a href="https://drive.google.com/drive/folders/1gjSjz9ATOhcoryzxGi1nqriKwLatLBq7" target="_blank">Facebook Game</a></li>
+      </ul>
+    </section>
+
+    <!-- Section 3: Matching PFPs -->
+    <section>
+      <h2>Matching PFPs</h2>
+      <p><a href="https://drive.google.com/drive/folders/1G2YIfnioPvLr3FTH2pAyYPN5R_wCCRkH" target="_blank">Click here</a></p>
+    </section>
+
+    <!-- Section 4: Memories -->
+    <section>
+      <h2>Screenshots & Screen Recordings</h2>
+      <p><a href="https://drive.google.com/drive/folders/1k7fCR8PHnLnjssuw3PynWn7d2zGjhZ3S" target="_blank">Click here</a></p>
+    </section>
+
+    <!-- Section 5: Videos -->
+    <section>
+      <h2>Video Calls</h2>
+      <p><a href="https://drive.google.com/drive/folders/1wMink-NhxaGMOALbkmkER_meW2fo9yER" target="_blank">Click here</a></p>
+    </section>
+
+    <section>
+      <h2>Titanium Alloy</h2>
+      <p><a href="https://drive.google.com/drive/folders/11XEmznQN0gfRnBmVt-F_7mf_-sIpVapD" target="_blank">Click here</a></p>
+    </section>
+
+    <section>
+      <h2>Doodles</h2>
+      <p><a href="https://drive.google.com/drive/folders/1NdJU0k36CuxhMN4vA5PyBwFyj1tYKXmZ" target="_blank">Click here</a></p>
+    </section>
+
+    <section>
+      <h2>Fun Stuff We Made</h2>
+      <p><a href="https://drive.google.com/drive/folders/1oFTg-DwU3wPQq4s0jCX0OtphKfuYxFm1" target="_blank">Click here</a></p>
+    </section>
+
+    <section>
+      <h2>Our Pics & Videos</h2>
+      <p><a href="https://drive.google.com/drive/folders/1hfWktIZahfMqqIWrNeIPWSSc0p2zkJxa" target="_blank">Click here</a></p>
+    </section>
+
+    <section>
+      <h2>Movie dates</h2>
+      <p><a href="https://drive.google.com/drive/folders/1wXQquwGgo-AXkDQnBFOnISCNUo2GO88Q" target="_blank">Click here</a></p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>I love you Ally, Forever & Always 💌</p>
+  </footer>
+
+  <script>
+    function toggleMenu() {
+      document.getElementById("sideMenu").classList.toggle("show");
+    }
+
+    function toggleSubmenu(event, el) {
+      event.preventDefault();
+      el.parentElement.classList.toggle("open");
+    }
+
+    // Load shared menu
+    fetch("menu.html")
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById("menu-container").innerHTML = data;
+      });
+  </script>
+</body>
+</html>
