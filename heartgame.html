@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Catch My Heart 💖</title>
+<style>
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin:0; padding:0;
+    font-family: Arial, sans-serif;
+    background:#ffe6ec;
+    display:flex; flex-direction: column; align-items: center;
+    height: 100vh; overflow: hidden; user-select:none;
+  }
+  #homeScreen {
+    position:absolute; top:0; left:0; width:100vw; height:100vh;
+    background:#ff3366; color:#fff;
+    display:flex; flex-direction: column; justify-content:center; align-items:center;
+    padding:20px; text-align:center; z-index:100;
+  }
+  #homeScreen h1 {
+    font-size:3em; margin-bottom:0.2em;
+  }
+  #homeScreen p {
+    font-size:1.2em; margin-bottom:2em; line-height:1.4;
+  }
+  #homePlayBtn {
+    font-size:28px;
+    background:#fff; color:#ff3366;
+    padding:18px 48px;
+    border:none; border-radius:40px;
+    cursor:pointer; box-shadow:0 8px 20px rgba(0,0,0,0.2);
+    user-select:none;
+  }
+  #homePlayBtn:hover {
+    background:#ffe6ec;
+  }
+  #topControls {
+    width: 360px;
+    max-width: 95vw;
+    display:flex; justify-content: space-between;
+    padding:10px 0;
+    margin-top: 15px;
+    user-select:none;
+    z-index: 50;
+  }
+  #topControls button {
+    background:#fff; border:none;
+    font-size:18px; padding:8px 14px;
+    border-radius:12px; cursor:pointer;
+    user-select:none;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+  #topControls button:hover {
+    background:#ffbbe6;
+  }
+  #gameContainer {
+    position: relative;
+    width: 360px; height: 600px;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    overflow: hidden;
+    margin-top: 10px;
+  }
+  #score {
+    position:absolute; top:15px; left:20px;
+    font-weight:bold;
+    color:#d6336c;
+    user-select:none;
+    font-size:20px;
+    z-index:10;
+  }
+  #lives {
+    position:absolute; top:15px; right:20px;
+    font-weight:bold;
+    color:#d6336c;
+    user-select:none;
+    font-size:20px;
+    letter-spacing: 6px;
+    z-index:10;
+  }
+  .heart {
+    position:absolute;
+    cursor:pointer;
+    font-size:30px;
+    animation-name: fall;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
+    animation-play-state: running;
+    user-select:none;
+    margin: -8px 0 0 -8px;
+    touch-action: manipulation;
+  }
+  .white-heart {
+    color: white;
+    text-shadow: 0 0 8px #fff;
+    font-size: 32px;
+  }
+  .matcha-heart {
+    color: #4caf50;
+    text-shadow: 0 0 8px #4caf50;
+    font-size: 30px;
+  }
+  @keyframes fall {
+    0% { top: -40px; opacity: 1;}
+    100% { top: 600px; opacity: 1;}
+  }
+  #gameOverScreen {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.95);
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 20;
+    user-select:none;
+    border-radius: 20px;
+  }
+  #gameOverScreen h2 {
+    color: #d6336c;
+    font-size: 32px;
+    margin: 0;
+  }
+  #restartAfterGameOver {
+    margin-top: 20px;
+    font-size: 20px;
+    padding: 12px 26px;
+    border-radius: 25px;
+    border: none;
+    background: #ff3366;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(255,51,102,0.6);
+  }
+  #textBox {
+    width: 360px;
+    max-width: 95vw;
+    background: #fff;
+    padding: 10px 20px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    border-radius: 10px;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    font-size: 16px;
+    color: #333;
+    user-select:none;
+    min-height: 48px;
+  }
+  #textBox .emoji {
+    font-size: 30px;
+    margin-right: 10px;
+  }
+
+  /* Settings popup */
+  #settingsPopup {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    padding: 24px 30px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+    border-radius: 16px;
+    display: none;
+    z-index: 200;
+    user-select:none;
+    width: 320px;
+    max-width: 90vw;
+  }
+  #settingsPopup h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #d6336c;
+    font-size: 24px;
+    text-align: center;
+  }
+  #settingsPopup label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #444;
+  }
+  #settingsPopup input[type="range"] {
+    width: 100%;
+  }
+  #settingsCloseBtn {
+    margin-top: 24px;
+    width: 100%;
+    background: #ff3366;
+    border: none;
+    color: white;
+    font-size: 18px;
+    padding: 10px 0;
+    border-radius: 12px;
+    cursor: pointer;
+    user-select:none;
+  }
+  #settingsCloseBtn:hover {
+    background: #e62e58;
+  }
+</style>
+</head>
+<body>
+<div id="homeScreen">
+  <h1>Catch My Heart 💖</h1>
+  <p>Catch them hearts, don't let them fall</p>
+  <button id="homePlayBtn">▶️ Play</button>
+</div>
+<div id="topControls" style="display:none;">
+  <button id="restartBtn">🔁 Restart</button>
+  <button id="pauseBtn">⏸️ Pause</button>
+  <button id="settingsBtn">⚙️ Settings</button>
+</div>
+<div id="gameContainer">
+  <div id="score">❤️ Caught: 0</div>
+  <div id="lives">❤️❤️❤️</div>
+  <div id="gameOverScreen">
+    <h2>Game Over 💔</h2>
+    <button id="restartAfterGameOver">Try Again</button>
+  </div>
+</div>
+<div id="textBox">
+  <span class="emoji">😡</span>
+  <span id="textMessage">Catch the hearts and survive</span>
+</div>
+<div id="settingsPopup" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+  <h3 id="settingsTitle">Unmadinator</h3>
+  <label for="moodSlider">Set Mood Tone</label>
+  <input type="range" id="moodSlider" min="0" max="100" value="50" />
+  <button id="settingsCloseBtn">Close Settings</button>
+</div>
+<script>
+    const homeScreen = document.getElementById('homeScreen');
+const homePlayBtn = document.getElementById('homePlayBtn');
+const topControls = document.getElementById('topControls');
+const restartBtn = document.getElementById('restartBtn');
+const pauseBtn = document.getElementById('pauseBtn');
+const settingsBtn = document.getElementById('settingsBtn');
+const gameContainer = document.getElementById('gameContainer');
+const scoreDisplay = document.getElementById('score');
+const livesDisplay = document.getElementById('lives');
+const gameOverScreen = document.getElementById('gameOverScreen');
+const restartAfterGameOver = document.getElementById('restartAfterGameOver');
+const textMessage = document.getElementById('textMessage');
+const textEmoji = document.querySelector('#textBox .emoji');
+const settingsPopup = document.getElementById('settingsPopup');
+const moodSlider = document.getElementById('moodSlider');
+const settingsCloseBtn = document.getElementById('settingsCloseBtn');
+
+let score = 0;
+let lives = 3;
+let hearts = [];
+let currentFallDuration = 5; // seconds (lower is faster)
+let heartsPerSpawn = 1;
+let gameRunning = false;
+let paused = false;
+let settingsOpen = false;
+
+let spawnInterval, speedInterval, whiteHeartInterval, matchaHeartInterval, cheerInterval;
+
+let speedHintShown = false;
+let matchaHintShown = false;
+let whiteHintShown = false;
+
+const cheerfulMessages = [
+  "You got this! 💪",
+  "Keep going, love! 💖",
+  "I'm cheering for you! 🎉",
+  "Almost there! ✨",
+  "You're amazing! 😍"
+];
+
+// Mood tone changes background pinkish color from soft (0) to intense (100)
+moodSlider.addEventListener('input', () => {
+  const val = moodSlider.value;
+  document.body.style.background = `rgba(255, 54, 95, ${val/100})`;
+});
+
+function updateTextWithEmoji(text, emoji, isGuidance = false) {
+  textEmoji.textContent = emoji;
+  textMessage.textContent = text;
+
+  // Guidance blocks cheering messages
+  if (isGuidance) {
+    if (cheerInterval) {
+      clearInterval(cheerInterval);
+      cheerInterval = null;
+    }
+  } else {
+    // Start cheering only if all guidance shown
+    if (speedHintShown && matchaHintShown && whiteHintShown) {
+      if (!cheerInterval) {
+        cheerInterval = setInterval(() => {
+          if (!gameRunning || paused || settingsOpen) return;
+          const msg = cheerfulMessages[Math.floor(Math.random() * cheerfulMessages.length)];
+          updateTextWithEmoji(msg, "😊", false);
+        }, 5000);
+      }
+    }
+  }
+}
+
+function createHeart(isWhite=false, isMatcha=false) {
+  if(!gameRunning || paused || settingsOpen) return;
+  const heart = document.createElement('div');
+  heart.classList.add('heart');
+  if (isWhite) {
+    heart.classList.add('white-heart');
+    heart.textContent = '🤍';
+  } else if (isMatcha) {
+    heart.classList.add('matcha-heart');
+    heart.textContent = '🍵';
+  } else {
+    heart.textContent = '❤️';
+  }
+  heart.style.left = Math.random() * (gameContainer.clientWidth - 40) + 'px';
+  heart.style.top = '-40px';
+  // Hitbox slightly bigger: add padding by increasing fontSize slightly randomly (min 28px)
+  heart.style.fontSize = (28 + Math.random() * 10) + 'px';
+  heart.style.animationDuration = currentFallDuration + 's';
+  heart.style.animationPlayState = paused || settingsOpen ? 'paused' : 'running';
+
+  gameContainer.appendChild(heart);
+
+  hearts.push({element: heart, isWhite, isMatcha, caught:false});
+
+  heart.addEventListener('click', () => {
+    if (heart.caught) return;
+    heart.caught = true;
+    if (isWhite) {
+      score += 5;
+      scoreDisplay.textContent = `❤️ Caught: ${score}`;
+    } else if (isMatcha) {
+      lives++;
+      livesDisplay.textContent = '❤️'.repeat(lives);
+    } else {
+      score++;
+      scoreDisplay.textContent = `❤️ Caught: ${score}`;
+    }
+    heart.remove();
+    hearts = hearts.filter(h => h.element !== heart);
+  });
+
+  setTimeout(() => {
+    if (!heart.caught) {
+      if (isMatcha) return; // no penalty for missing matcha
+      loseLife();
+      heart.remove();
+      hearts = hearts.filter(h => h.element !== heart);
+    }
+  }, currentFallDuration * 1000);
+}
+
+function spawnHearts() {
+  if (!gameRunning || paused || settingsOpen) return;
+  for(let i=0; i<heartsPerSpawn; i++) {
+    createHeart();
+  }
+}
+
+function spawnWhiteHeart() {
+  if (!gameRunning || paused || settingsOpen) return;
+  createHeart(true);
+  if (!whiteHintShown) {
+    updateTextWithEmoji("White hearts add 5 points! 🤍", "🤍", true);
+    whiteHintShown = true;
+    checkAllHintsShown();
+  }
+}
+
+function spawnMatchaHeart() {
+  if (!gameRunning || paused || settingsOpen) return;
+  let baseChance = 0.08; // rarer than before
+  let speedFactor = (5 - currentFallDuration) / 3.5;
+  let chance = baseChance + speedFactor * 0.25;
+  if (Math.random() < chance) {
+    createHeart(false,true);
+    if (!matchaHintShown) {
+      updateTextWithEmoji("Matcha hearts add lives! 🍵", "🍵", true);
+      matchaHintShown = true;
+      checkAllHintsShown();
+    }
+  }
+}
+
+function loseLife() {
+  if (lives > 1) {
+    lives--;
+    livesDisplay.textContent = '❤️'.repeat(lives);
+  } else {
+    endGame();
+  }
+}
+
+function checkAllHintsShown() {
+  if(speedHintShown && matchaHintShown && whiteHintShown) {
+    startCheerInterval();
+  }
+}
+
+function startCheerInterval() {
+  if (!cheerInterval) {
+    cheerInterval = setInterval(() => {
+      if (!gameRunning || paused || settingsOpen) return;
+      const msg = cheerfulMessages[Math.floor(Math.random() * cheerfulMessages.length)];
+      updateTextWithEmoji(msg, "😊", false);
+    }, 5000);
+  }
+}
+
+function startGame() {
+  if(gameRunning) return;
+  gameRunning = true;
+  paused = false;
+  settingsOpen = false;
+
+  score = 0;
+  lives = 3;
+  heartsPerSpawn = 1;
+  currentFallDuration = 5;
+  hearts.forEach(h => h.element.remove());
+  hearts = [];
+
+  speedHintShown = false;
+  matchaHintShown = false;
+  whiteHintShown = false;
+
+  scoreDisplay.textContent = `❤️ Caught: ${score}`;
+  livesDisplay.textContent = '❤️'.repeat(lives);
+  topControls.style.display = 'flex';
+  gameOverScreen.style.display = 'none';
+
+  updateTextWithEmoji("Catch the hearts to survive", "😡", true);
+
+  spawnInterval = setInterval(spawnHearts, 700);
+  speedInterval = setInterval(() => {
+    if (currentFallDuration > 1.5) {
+      currentFallDuration -= 0.5;
+      heartsPerSpawn++;
+      if (!speedHintShown) {
+        updateTextWithEmoji("Game will get harder! Keep going! 💪", "🔥", true);
+        speedHintShown = true;
+        checkAllHintsShown();
+      }
+    }
+  }, 15000);
+  whiteHeartInterval = setInterval(spawnWhiteHeart, 30000);
+  matchaHeartInterval = setInterval(spawnMatchaHeart, 5000);
+}
+
+function clearIntervals() {
+  clearInterval(spawnInterval);
+  clearInterval(speedInterval);
+  clearInterval(whiteHeartInterval);
+  clearInterval(matchaHeartInterval);
+  if (cheerInterval) {
+    clearInterval(cheerInterval);
+    cheerInterval = null;
+  }
+}
+
+function pauseGame() {
+  if(!gameRunning || paused) return;
+  paused = true;
+  clearIntervals();
+  hearts.forEach(({element}) => {
+    element.style.animationPlayState = 'paused';
+  });
+  pauseBtn.textContent = '▶️ Resume';
+}
+function resumeGame() {
+  if(!gameRunning || !paused) return;
+  paused = false;
+  hearts.forEach(({element}) => {
+    element.style.animationPlayState = 'running';
+  });
+  spawnInterval = setInterval(spawnHearts, 700);
+  speedInterval = setInterval(() => {
+    if (currentFallDuration > 1.5) {
+      currentFallDuration -= 0.5;
+      heartsPerSpawn++;
+      if (!speedHintShown) {
+        updateTextWithEmoji("Game will get harder! Keep going! 💪", "🔥", true);
+        speedHintShown = true;
+        checkAllHintsShown();
+      }
+    }
+  }, 15000);
+  whiteHeartInterval = setInterval(spawnWhiteHeart, 30000);
+  matchaHeartInterval = setInterval(spawnMatchaHeart, 5000);
+  pauseBtn.textContent = '⏸️ Pause';
+}
+
+function endGame() {
+  gameRunning = false;
+  paused = false;
+  clearIntervals();
+  hearts.forEach(({element}) => element.remove());
+  hearts = [];
+  gameOverScreen.style.display = 'flex';
+  topControls.style.display = 'none';
+  updateTextWithEmoji("Game over! Try again? 💔", "😢", true);
+}
+
+homePlayBtn.addEventListener('click', () => {
+  homeScreen.style.display = 'none';
+  startGame();
+});
+
+restartBtn.addEventListener('click', () => {
+  if (gameRunning || paused) {
+    clearIntervals();
+    hearts.forEach(({element}) => element.remove());
+    hearts = [];
+    startGame();
+  }
+});
+
+pauseBtn.addEventListener('click', () => {
+  if (!gameRunning) return;
+  if (paused) {
+    resumeGame();
+  } else {
+    pauseGame();
+  }
+});
+
+restartAfterGameOver.addEventListener('click', () => {
+  gameOverScreen.style.display = 'none';
+  startGame();
+});
+
+settingsBtn.addEventListener('click', () => {
+  settingsOpen = true;
+  settingsPopup.style.display = 'block';
+  pauseGame();
+});
+
+settingsCloseBtn.addEventListener('click', () => {
+  settingsOpen = false;
+  settingsPopup.style.display = 'none';
+  if (paused) {
+    resumeGame();
+  }
+});
+
+// Prevent text selection and scrolling on touch devices for game area
+gameContainer.addEventListener('touchmove', e => {
+  e.preventDefault();
+}, { passive: false });
+
+// Prevent double tap zoom
+let lastTouch = 0;
+gameContainer.addEventListener('touchend', e => {
+  const now = Date.now();
+  if (now - lastTouch <= 300) {
+    e.preventDefault();
+  }
+  lastTouch = now;
+}, { passive: false });
+
+</script>
+</body>
+</html>
+    
+    

@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Where it will take you?</title>
+<style>
+  :root{--bg:#f2f2f2;--panel:#fff;--accent:#4CAF50;--muted:#888;--dark:#222}
+  html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;background:var(--bg);}
+  .screen{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:12px;box-sizing:border-box;position:relative}
+  #textBox{width:92%;max-width:560px;height:210px;border-radius:10px;background:var(--panel);padding:12px;box-sizing:border-box;overflow-y:auto;border:2px solid #333;margin-bottom:10px}
+  #actionLine{width:92%;max-width:560px;margin:6px 0;font-weight:700}
+  #choices{width:92%;max-width:560px;display:flex;flex-direction:column;margin-bottom:12px}
+  .choiceBtn{padding:12px;border-radius:8px;border:0;margin:6px 0;background:var(--accent);color:#fff;font-size:16px}
+  .choiceBtn:disabled{background:var(--muted)}
+  #pauseBtn,#inventoryBtn{position:absolute;padding:8px 10px;border-radius:6px;border:0;background:var(--dark);color:#fff;font-size:13px}
+  #pauseBtn{right:12px;top:12px} #inventoryBtn{left:12px;top:12px}
+  #pauseMenu,#inventoryPopup{display:none;position:absolute;top:52px;background:var(--panel);border:2px solid #333;padding:10px;border-radius:8px;z-index:40;box-sizing:border-box}
+  #pauseMenu{right:12px;width:220px} #inventoryPopup{left:12px;width:220px}
+  #overlayDim{display:none;position:absolute;inset:0;background:rgba(0,0,0,0.32);z-index:30}
+  #finalButton{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);padding:14px 18px;border-radius:10px;border:0;background:var(--accent);color:#fff;font-size:18px;display:none;z-index:100}
+  @keyframes shake {0%{transform:translate(-50%,-50%) translateX(0)}25%{transform:translate(-50%,-50%) translateX(-8px)}50%{transform:translate(-50%,-50%) translateX(8px)}75%{transform:translate(-50%,-50%) translateX(-6px)}100%{transform:translate(-50%,-50%) translateX(0)}}
+  .shake{animation:shake .6s}
+  p{margin:6px 0}
+  strong.action{font-weight:800}
+  .dialogue { margin:6px 0; }
+  .dialogue .name { font-weight:700; display:inline-block; margin-right:6px; }
+  em{font-style:italic;}
+</style>
+</head>
+<body>
+
+<div id="game" class="screen">
+  <div id="overlayDim"></div>
+  <button id="pauseBtn">Pause</button>
+  <button id="inventoryBtn">Inventory</button>
+
+  <div id="pauseMenu">
+    <p><strong>Background Color</strong></p>
+<input id="colorSlider" type="range" min="0" max="100" value="0">
+    <div style="margin-top:8px;text-align:right"><button id="pauseClose" class="choiceBtn" style="background:#333">Close</button></div>
+  </div>
+
+  <div id="inventoryPopup">
+    <p><strong>Inventory</strong></p>
+    <ul id="inventoryList" style="padding-left:18px;margin-top:6px;margin-bottom:8px"></ul>
+    <div style="text-align:right"><button id="invClose" class="choiceBtn" style="background:#333;padding:8px 10px">Close</button></div>
+  </div>
+
+  <div id="textBox" aria-live="polite"></div>
+  <div id="actionLine">Choose your next move.</div>
+  <div id="choices"></div>
+</div>
+
+<button id="finalButton">Reply</button>
+
+<script>
+/* ========= Engine ========= */
+const textBox=document.getElementById('textBox');
+const choicesDiv=document.getElementById('choices');
+const actionLine=document.getElementById('actionLine');
+const pauseBtn=document.getElementById('pauseBtn');
+const pauseMenu=document.getElementById('pauseMenu');
+const overlayDim=document.getElementById('overlayDim');
+const inventoryBtn=document.getElementById('inventoryBtn');
+const inventoryPopup=document.getElementById('inventoryPopup');
+const inventoryList=document.getElementById('inventoryList');
+const musicVolume=document.getElementById('musicVolume');
+const pauseClose=document.getElementById('pauseClose');
+const invClose=document.getElementById('invClose');
+const finalButton=document.getElementById('finalButton');
+
+let inventory=[]; let isTyping=false; let canShowPutankina=true;
+
+function escapeHtml(s){return s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');}
+function typewriterAppend(htmlString,cb){
+  if(isTyping){setTimeout(()=>typewriterAppend(htmlString,cb),60);return;}
+  isTyping=true;
+  const p=document.createElement('p');p.style.margin='6px 0';const full=htmlString;p.innerHTML='';textBox.appendChild(p);
+  let i=0;const speed=18;
+  const t=setInterval(()=>{p.innerHTML=full.slice(0,i);textBox.scrollTop=textBox.scrollHeight;i++;
+    if(i>full.length){clearInterval(t);isTyping=false;if(cb)cb();}},speed);}
+function appendNarration(t,cb){typewriterAppend(`<em>${escapeHtml(t)}</em>`,cb);}
+function appendDialogue(n,l,cb){typewriterAppend(`<span class="dialogue"><strong class="name">${escapeHtml(n)}:</strong> "${escapeHtml(l)}"</span>`,cb);}
+function appendItemLog(t,cb){typewriterAppend(`<strong class="action">&gt; ${escapeHtml(t)}</strong>`,cb);}
+function appendAction(t,cb){typewriterAppend(`<strong class="action">&gt; ${escapeHtml(t)}</strong>`,cb);}
+function appendPlain(t,cb){typewriterAppend(escapeHtml(t),cb);}
+function setChoices(list){choicesDiv.innerHTML='';if(!list||list.length===0){actionLine.style.display='none';return;}
+  actionLine.style.display='block';
+  list.forEach(item=>{if(item.condition&&!item.condition())return;const b=document.createElement('button');b.className='choiceBtn';b.textContent=item.text;
+    b.onclick=()=>{disableChoices();setTimeout(()=>{item.action&&item.action();enableChoices();},80);};choicesDiv.appendChild(b);});
+  if(canShowPutankina){
+  const b=document.createElement('button');
+  b.className='choiceBtn';
+  b.textContent='Putankina';
+  b.onclick=()=>typewriterAppend(`<span class="dialogue"><strong class="name">You:</strong> "Putankina"</span>`);
+  choicesDiv.appendChild(b);
+}}
+function disableChoices(){choicesDiv.querySelectorAll('button').forEach(b=>b.disabled=true);}
+function enableChoices(){choicesDiv.querySelectorAll('button').forEach(b=>b.disabled=false);}
+function addItem(n){if(!inventory.includes(n)){inventory.push(n);appendItemLog(`You received ${n}.`);}else appendItemLog(`You already have ${n}.`);updateInventoryUI();}
+function useItem(n){if(inventory.includes(n)){inventory=inventory.filter(i=>i!==n);appendItemLog(`You used ${n}.`);updateInventoryUI();return true;}appendItemLog(`You don't have ${n}.`);return false;}
+function updateInventoryUI(){inventoryList.innerHTML='';if(inventory.length===0){const li=document.createElement('li');li.textContent='(empty)';inventoryList.appendChild(li);return;}inventory.forEach(it=>{const li=document.createElement('li');li.textContent=it;inventoryList.appendChild(li);});}
+pauseBtn.onclick=()=>{const o=pauseMenu.style.display==='block';pauseMenu.style.display=o?'none':'block';overlayDim.style.display=o?'none':'block';};
+pauseClose.onclick=()=>{pauseMenu.style.display='none';overlayDim.style.display='none';};
+inventoryBtn.onclick=()=>{const o=inventoryPopup.style.display==='block';if(!o)updateInventoryUI();inventoryPopup.style.display=o?'none':'block';overlayDim.style.display=o?'none':'block';};
+invClose.onclick=()=>{inventoryPopup.style.display='none';overlayDim.style.display='none';};
+function showFinalInfiniteButtons(label){finalButton.textContent=label||'Reply';finalButton.style.display='block';choicesDiv.style.display='none';actionLine.style.display='none';let f=true;
+  finalButton.onclick=()=>{if(f){f=false;finalButton.classList.add('shake');setTimeout(()=>{finalButton.classList.remove('shake');pauseBtn.style.display='none';inventoryBtn.style.display='none';pauseMenu.style.display='none';inventoryPopup.style.display='none';overlayDim.style.display='none';textBox.style.display='none';},650);}
+  else{finalButton.style.transform='scale(0.98)';setTimeout(()=>finalButton.style.transform='',90);}};}
+  
+  function appendEnding(text, cb){
+  // safe: we escape the text then wrap in <strong> via escapeHtml
+  // but typewriterAppend expects raw HTML so we need to escape the text content,
+  // then put it inside strong.
+  const safe = escapeHtml(text);
+  typewriterAppend(`<strong>${safe}</strong>`, cb);
+}
+
+const colorSlider = document.getElementById('colorSlider');
+
+// define soft colors
+const colors = [
+  [200, 230, 200], // matcha green (soft)
+  [200, 220, 255], // soft blue
+  [255, 210, 220]  // soft pink
+];
+
+// lerp between two RGB colors
+function lerpColor(c1, c2, t){
+  return [
+    Math.round(c1[0] + (c2[0]-c1[0]) * t),
+    Math.round(c1[1] + (c2[1]-c1[1]) * t),
+    Math.round(c1[2] + (c2[2]-c1[2]) * t)
+  ];
+}
+
+colorSlider.addEventListener("input", () => {
+  let val = colorSlider.value / 100; // normalize 0–1
+  let scaled = val * (colors.length - 1);
+  let idx = Math.floor(scaled);
+  let t = scaled - idx;
+
+  let c1 = colors[idx];
+  let c2 = colors[Math.min(idx+1, colors.length-1)];
+  let rgb = lerpColor(c1, c2, t);
+
+  document.body.style.background = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+});
+
+/* ========= Story ========= */
+/* =========================
+   Section 1 — Night Argument Scenes
+   ========================= */
+
+let showBrokenPhoneNote = false;
+
+function scene_night_room(){
+  appendPlain('Text on Phone: "Why don\'t you listen to me??"', ()=>{
+    appendNarration("All lights in your room are off, everything looks dark. You can see some light coming from night sky through window. Only light source in room is your phone where you are texting. Room has no sound except your breathing, your sniffling, and rain outside.", ()=>{
+      setChoices([
+        {
+          text: "You don't do too",
+          action: ()=>{
+            appendDialogue('You', "Because you don't too motherfucker.", ()=>{
+              appendNarration("Nayan replies immediately, maybe typing in anger, just like you. Tears start flowing down your eyes.", ()=>{
+                appendDialogue('Nayan', "I do, but you never.", ()=>{
+                  setChoices([
+                    {
+                      text: "Shut up",
+                      action: ()=>{
+                        appendDialogue('You',"Shut the fuck up nayan please.", ()=>{
+                          appendNarration("Nayan pauses for a moment before his typing bubble shows again.", ()=>{
+                            appendDialogue('Nayan',"Calm the fuck down.", ()=>{
+                              setChoices([
+                                {
+                                  text: "You don't care",
+                                  action: ()=>{
+                                    appendDialogue('You',"You don't even care if I cry, you always act heartless, you don't care.", ()=>{
+                                      appendDialogue('Nayan',"I do but rn I'm hurt too.", ()=>{
+                                        setChoices([
+                                          {
+                                            text: "Kys",
+                                            action: ()=>{
+                                              appendDialogue('You',"Go kys.", ()=>{
+                                                appendNarration("Nayan doesn't reply for a few mins, maybe he got hurt. Then just after a few seconds, he reacts with a heart emoji to your message.", ()=>{
+                                                  setChoices([
+                                                    { text: "Toss the phone away and sleep", action: ()=>{ appendAction("You tossed the phone away."); showBrokenPhoneNote=true; scene_after_toss(); } }
+                                                  ]);
+                                                });
+                                              });
+                                            }
+                                          },
+                                          { text: "Toss phone away and sleep", secondary:true, action: ()=>{ appendAction("You tossed the phone away."); showBrokenPhoneNote=true; scene_after_toss(); } }
+                                        ]);
+                                      });
+                                    });
+                                  }
+                                },
+                                { text: "Toss phone away and sleep", secondary:true, action: ()=>{ appendAction("You tossed the phone away."); showBrokenPhoneNote=true; scene_after_toss(); } }
+                              ]);
+                            });
+                          });
+                        });
+                      }
+                    },
+                    { text: "Toss phone away and sleep", secondary:true, action: ()=>{ appendAction("You tossed the phone away."); showBrokenPhoneNote=true; scene_after_toss(); } }
+                  ]);
+                });
+              });
+            });
+          }
+        },
+        { text: "Toss phone away and sleep", secondary:true, action: ()=>{ appendAction("You tossed the phone away."); showBrokenPhoneNote=true; scene_after_toss(); } }
+      ]);
+    });
+  });
+}
+
+function scene_after_toss(){
+  appendNarration("You toss the phone away. It probably hit the floor a lil too hard, cuz its screen goes off. But you don't care about phone right now.... You're angry, hurt, and crying too", ()=>{
+    appendDialogue('You',"I hate you Nayan.", ()=>{
+      appendNarration("You say it and slowly fall asleep with tears in your eyes. It's raining very heavy.", ()=>{
+        setChoices([{ text:"Continue", action: ()=>{ scene_morning_room(); } }]);
+      });
+    });
+  });
+}
+
+/* =========================
+   Section 2 — Morning Room + Kitchen
+   ========================= */
+
+let visitedMorningRoom = false;
+
+function scene_morning_room(){
+  // run intro once, then go to the hub
+  if (!visitedMorningRoom) {
+    visitedMorningRoom = true;
+    appendNarration("You feel something on your chest, sharp, udk what that is. Your eyes opens slowly and it's Nally on you, maybe trying to wake you up.Nally meows and gets off you and sits on bed beside you. You look around and see.*", ()=>{
+      // after the intro, show the hub
+      morningRoomHub();
+    });
+  } else {
+    // subsequent visits: show only choices (no long text)
+    morningRoomHub();
+  }
+}
+
+function morningRoomHub(){
+  setChoices([
+    { text: 'Nally', action: ()=>{ appendNarration('You pat nally and give her some belly rubs, maybe she is hungry, lets get her some food from kitchen.'); } },
+    { text: 'Mirror', action: ()=>{ appendNarration('You look in the mirror at yourself, You look prettier than ever you could look.'); } },
+    { text: 'Window', action: ()=>{ appendNarration('You look outside the window, warm breeze hits your face slowly and everything looks so bright. Sky looks blue and brings peace to your mind.'); } },
+    { text: 'Box', action: ()=>{ 
+        // box behaviour uses key presence
+        if (inventory.includes('Small Key')) openBoxScene();
+        else appendNarration("The box is locked. You don't remember what's inside.");
+      }
+    },
+    { text: 'Phone', action: ()=>{ 
+        if (!inventory.includes('Broken Phone')) {
+          appendNarration("You pick up phone from floor. Screen is completely shattered, it's not turning on too", ()=>{ addItem('Broken Phone'); });
+        } else {
+          appendNarration("Your broken phone is still with you.");
+        }
+      }
+    },
+    { text: 'Exit Room', action: ()=>{ appendNarration('You head downstairs to the kitchen.', ()=>{ // go to kitchen intro
+          scene_kitchen();
+    }); } }
+  ]);
+}
+
+let visitedKitchen = false;
+
+function scene_kitchen(){
+  if (!visitedKitchen) {
+    visitedKitchen = true;
+    // Play Mama's intro once
+    appendDialogue("Mama","You woke up so early. Sit down alysa. Im still cooking.", ()=>{
+      kitchenHub();
+    });
+  } else {
+    kitchenHub();
+  }
+}
+
+function kitchenHub(){
+  setChoices([
+    { text: 'Table', action: ()=>{ 
+        if (!inventory.includes('Small Key')) {
+          // show the table sub-choices (take/leave)
+          appendNarration("There's a small key on the table.", ()=> {
+            setChoices([
+              { text: 'Take it', action: ()=>{ addItem('Small Key'); kitchenHub(); } },
+              { text: 'Leave', action: kitchenHub } // note: go back to hub, not kitchen intro
+            ]);
+          });
+        } else {
+          appendNarration("The table is empty. You already took the key.");
+        }
+      }
+    },
+    { text: 'Refrigerator', action: ()=>{ appendNarration("You open refrigerator and take a water bottle out, and drink water. Feeling fresh now."); } },
+    { text: 'Go back to your room', action: ()=>{ morningRoomHub(); } },
+    { text: 'Door', action: ()=>{ appendNarration("You can't leave the house yet."); } }
+  ]);
+}
+
+function openBoxScene(){
+  if(!inventory.includes("Small Key")){ 
+    appendNarration("The box is still locked — you need a key."); 
+    setChoices([{ text:"Go back", action: scene_morning_room }]); 
+    return; 
+  }
+  appendAction("You unlocked the box.");
+  appendNarration("Inside box you find some items.", ()=>{
+    setChoices([
+      { text:"Look around", action: ()=>{ appendNarration("This box is filled with all previous gifts from your sexy and handsome boyfriend nayan"); }},
+      { text:"Letter", action: ()=>{ appendNarration("It's a recent letter from Nayan... what's inside?", ()=>{ setChoices([{ text:"Read", action: letterScene }]); }); }}
+    ]);
+  });
+}
+
+/* =========================
+   Section 3 — Letter + Pigeon
+   ========================= */
+
+function letterScene(){
+  appendNarration("You open the letter and start reading. it's colorful and looks just like his usual gifts", ()=>{
+    appendPlain('"Hi baby, I sent you this letter today to let you know that Im coming to meet you, tomorrow on our anniversary. So be prepared and keep those cheeks ready ahahsahh. I will be there around 11 am, owk? labyu!!"', ()=>{
+      appendNarration("You are panicked because..... TODAY is the anniversary, and u are skard because it's 10 am already. It's first time nayan is coming to meet you.", ()=>{
+        appendNarration("You immediately get out of bed and wear your best clothes to impress nayan. Now you are ready and prepared but now it's 11:30 am and still there is no sign of him... Suddenly a thump sound comes from other room.", ()=>{
+          setChoices([
+            { text:"Stay and ignore it", action: ()=>{ appendNarration("You ignore it... but the sound comes again.", ()=>{ setChoices([{ text:"Check it out", action: pigeonScene }]); }); }},
+            { text:"Check it out", action: pigeonScene }
+          ]);
+        });
+      });
+    });
+  });
+}
+
+function pigeonScene(){
+  appendNarration("You go to other room and find a pigeon sitting on a window, It have a letter in its beak, You take letter from it and read it", ()=>{
+    appendPlain('"ALLYYYYYY PLEASE HELP, I GOT HERE TO MANILA IN MORNING BUT I GOT FUCKING KIDNAPPED!!!!!! PLEASE COME AND SAVE ME.... I ATTACHED MAP HERE FOR YOU TO COME TO THE WAREHOUSE WHERE I\'M TRAPPED WITH THESE EVIL PEOPLE... PLS HELP."', ()=>{
+      appendDialogue("You","Lagot... Nayan is in danger, I have to save him now!", ()=>{
+        setChoices([
+          { text:"Sleep", action: ()=>{ appendNarration("You fell asleep and woke up next year."); appendPlain("The End"); setChoices([]); }},
+          { text:"Save Nayan", action: ()=>{ appendNarration("You walk outside the house... to save your retarded boyfriend...Will you be able to save his ass? Only one way to find out.", ()=>{ outsideScene(); }); }}
+        ]);
+      });
+    });
+  });
+}
+
+/* =========================
+   Section 4 — Outside
+   ========================= */
+
+function outsideScene(){
+  appendNarration("You are walking while looking at the map, and going where it takes you. Suddenly you see a handsome guy walking towards you. He looks at you and walks close", ()=>{
+    appendDialogue("Guy","Hey... I saw you from over there.", ()=>{
+      setChoices([
+        { text:"Sybau", action: ()=>{ appendNarration("You ignored the guy and kept walking like a sigma."); continueAfterGuy(); }},
+        { text:"yeah hi wassup", action: ()=>{ appendDialogue("You","yeah hi wassup", ()=>{ appendDialogue("Guy","Come w me, I'll show you", ()=>{
+          setChoices([
+            { text:"Okay show me", action: ()=>{ appendNarration("You followed the man and walked with him. Then you both fell in love with eachother and got married and lived together forever."); appendPlain("The End"); setChoices([]); }},
+            { text:"Nahh sybau", action: ()=>{ appendNarration("You ignored him and kept walking like a sigma."); continueAfterGuy(); }}
+          ]); }); }); }}
+      ]);
+    });
+  });
+}
+
+function continueAfterGuy(){
+  appendNarration("You look at map and continue your journey, afraid, confused but u want dat nayan dih so u walking.", ()=>{
+    appendNarration("A woman is standing on road, with a sign board that says 'Free pizza here'. You look at that and think about it, what if it's a trap or what if nayan is here?", ()=>{
+      setChoices([
+        { text:"Walk", action: ()=>{ appendNarration("You kept walking and ignored the woman, you got more important things to do than eating for now..."); setChoices([{ text:"Continue", action: warehouseApproach }]); }},
+        { text:"Ask", action: ()=>{ appendDialogue("Woman","free pizza here young lady, u want some or nahhhh", ()=>{
+          setChoices([
+            { text:"ok gimme", action: ()=>{ appendNarration("You accepted and walked into pizza restaurant, you got free pizza and luckily they were giving lifetime free pizza for customer having A, L, L, Y letter in names. You ate pizza everyday multiple times forever"); appendPlain("The End"); setChoices([]); }},
+            { text:"Continue", action: warehouseApproach }
+          ]); }); }}
+      ]);
+    });
+  });
+}
+
+/* =========================
+   Section 5 — Warehouse
+   ========================= */
+
+function warehouseApproach(){
+  appendNarration("You look at map, look in your front, maybe this is it.... it's the warehouse where your baby is trapped... But...Infront of door of warehouse, there's someone standing, what is he? or she..? or it....., Nobody got idea maybe it's the pobulam...", ()=>{
+    appendDialogue("Pobulam","What do you want?", ()=>{
+      appendDialogue("You","I just wanna go inside and save my man.", ()=>{
+        appendDialogue("Pobulam","Why do you wanna save him? He is just a nasty broke bad man, You can find a lot of better people than him out there. You got a long life, you can meet new people. Live your own life. with your own choices. Why stay bound because of one man...?", ()=>{
+          setChoices([
+            { text:"You are right", action: ()=>{ appendDialogue("You","You are right.", ()=>{ appendDialogue("Pobulam","I see you agree to me, now live your life and do better things", ()=>{ appendNarration("You walk away and go home, sleep, eat, lock in and repeat. You live your life the way u wanna live. <strong>Congratulations Ally</strong>"); setChoices([]); }); }); }},
+            { text:"Hmm", action: ()=>{ appendNarration("You stay and think about it and look him in eyes and say - Just give me the damn fucking key.", ()=>{ appendDialogue("Pobulam","Very well, Use this big key to get inside and use this bomb to kell all the bad guys inside at once.", ()=>{
+              appendNarration("You take allat stuff from him. When u look back at him, he ain't there, disappeared, gone. Only thing u see now is the door.", ()=>{
+                addItem("Warehouse Key"); addItem("Small Bomb");
+                setChoices([{ text:"Open door", action: ()=>{ if(useItem("Warehouse Key")){ enterWarehouse(); } else appendNarration("The door is locked."); } }]);
+              });
+            }); }); }}
+          ]);
+        });
+      });
+    });
+  });
+}
+
+function enterWarehouse(){
+  appendNarration("You open the door and see Nayan tied in middle of room and..... around him 3 people are standing.....And they are Batman, Godzilla and Ultraman.", ()=>{
+    setChoices([
+      { text:"Bomb", condition: ()=>inventory.includes("Small Bomb"), action: ()=>{ appendNarration("You throw dat bomb on them mfs and they all disappear and vanish into thin air. You run to Nayan and untie him. He looks malnourished ahahshs maybe he needs protein"); inventory=inventory.filter(i=>i!=="Small Bomb"); enterAfterRescue(); }}
+    ]);
+  });
+}
+
+function enterAfterRescue(){
+  appendDialogue("Nayan","You came all the way here to save me...?");
+  appendDialogue("You","Nigga how about you?? You came from india to here??");
+  appendDialogue("Nayan","Anything for my baby... Anyways are your cheeks ready? ahahaah", ()=>{
+    setChoices([
+      { text:"Stop owk", action: ()=>{ appendDialogue("You","Stop owk", ()=>{ appendDialogue("Nayan","Owk", ()=>{ surrealSequence(); }); }); }},
+      { text:"I'll slap you", action: ()=>{ appendDialogue("You","I'll slap you", ()=>{ appendDialogue("Nayan","Owk", ()=>{ surrealSequence(); }); }); }}
+    ]);
+  });
+}
+
+/* =========================
+   Section 6 — Surreal + Real Morning + Final
+   ========================= */
+
+function surrealSequence(){
+  appendNarration("Suddenly he starts acting weird and starts meowing, Everything distorts and starts to go blurry and....", ()=>{
+    appendNarration("You wake up.", ()=>{ realMorningScene(); });
+  });
+}
+
+function realMorningScene(){
+  appendNarration("You woke up and all of it was just a dream. You scratch your head, wishing it was true.", ()=>{
+    setChoices([
+      { text:"Mirror", action: ()=>{ appendNarration("You look into mirror, You look pretty as always."); }},
+      { text:"Nally", action: ()=>{ appendNarration("You pat Nally, she is just sleeping on bed, her stomach looking big, u wonder why"); }},
+      { text:"Window", action: ()=>{ appendNarration("You take a look outside the window. Smell of rain is in air. Sky is grey. It rained heavily last night. But it still looks peaceful outside. Just a matter of perception."); }},
+      { text:"Phone", action: ()=>{ appendNarration("You pick up phone from floor and check it through from every side. It's working and on. Just a little sctrach on screen. You turn on screen and your notifications are flooded with messages from Nayan. You opens his dm and it's lot of messages apologising and stuff. Here is the message.", ()=>{
+        appendPlain(`Happy 15th Monthversary baby!!!!!!!! ik this one wasn't very good day but it's okay, what matters to me most is that we are still together,  we can make next one fun then? I'm happy that you stay w me and tolerate me the way I tolerate you.. Maybe the real choices were the ones we made irl not this game... choice of loving eachother despite the flaws. Choice of staying together even after the fights. Choice of never giving up. Choice of sticking together 24/7. I may not be there to meet you rn for now like I was in dream but until that day, I'm always here for you. Always will be. Loving you from a distance tho but always close in your heart. I may not show it properly sometimes and gets lost in my own pobulams... But deep down I still love you and I hope you feel it. You might be the one and maybe that's why I'm ready to risk it all on you. But don't torture me too much sometimes tho I don't layk that.\n\nI hope you understand me and if you don't I hope you still try. And same w me, I hope you help me in understanding you. That's why we are together right, not just for esex or attention or gifts. Real Love baby.\n\nThat's all for it owk. And before you go. I wanna say... I love you Ally, my wife and my awesome girlfriend. I love you for being you, physically and emotionally. I love you as whole, always will, like I do now. Forever together, U and I. Labyu.❤️`, ()=>{
+          setChoices([
+            { text:"Reply", action: ()=>{ showFinalInfiniteButtons("Reply to Nayan"); }},
+          
+          ]);
+        });
+      }); }}
+    ]);
+  });
+}
+
+/* ========= Boot ========= */
+(function startGame(){
+  textBox.innerHTML='';setChoices([]);
+  scene_night_room();
+})();
+</script>
+</body>
+</html>
